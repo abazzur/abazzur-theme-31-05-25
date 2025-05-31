@@ -72,7 +72,7 @@
       },
       "free_shipping": {
         "remaining_html": "Faltam {{ remaining_amount }} para obter frete grátis!",
-        "congratulations_html": "Parabéns! Você ganhou frete grátis."
+        "congratulations_html": "Você ganhou frete grátis!"
       },
       "shipping_calculator": {
         "title": "Calcular frete",
