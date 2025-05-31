@@ -1,0 +1,262 @@
+{% comment %}
+  Snippet: discount-goal-notification.liquid
+  
+  Descrição: Exibe uma barra de progresso que mostra quanto falta para o cliente
+  receber 15% de desconto ao atingir R$ 5.000,00 no carrinho.
+  
+  Versão: 3.0 - Corrigida para visualização correta do progresso
+{% endcomment %}
+
+{%- liquid
+  # Definir o valor mínimo para o desconto (R$ 5.000,00 em centavos)
+  assign discount_minimum_amount = 500000
+  
+  # Obter o valor atual do carrinho
+  assign cart_total = cart.total_price | plus: 0
+  
+  # Calcular quanto falta para atingir o objetivo
+  assign amount_remaining = discount_minimum_amount | minus: cart_total
+  if amount_remaining < 0
+    assign amount_remaining = 0
+  endif
+  
+  # Calcular porcentagem do progresso (limitado a 100%)
+  assign percentage = cart_total | times: 100.0 | divided_by: discount_minimum_amount
+  if percentage > 100
+    assign percentage = 100
+  endif
+  
+  # Determinar se o desconto foi ganho
+  assign discount_earned = false
+  if cart_total >= discount_minimum_amount
+    assign discount_earned = true
+  endif
+-%}
+
+<style>
+/* Estilos para a barra de desconto - ABAZZUR design */
+.discount-goal-container {
+  width: 100%;
+  margin: 16px 0;
+}
+
+.discount-goal {
+  padding: 16px 0;
+  transition: all 0.3s ease;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Estilo para quando o desconto é ganho */
+.discount-goal[data-discount-earned="true"] {
+  border-color: rgba(0, 71, 171, 0.2);
+}
+
+/* Estilos para o texto da barra */
+.discount-goal-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.discount-goal-label--success {
+  color: #0047AB;
+  font-weight: 600;
+}
+
+/* Barra de progresso com gradiente mais vibrante */
+.discount-progress-wrapper {
+  width: 100%;
+  height: 6px;
+  background-color: #E8F1FF; /* Azul muito claro para o fundo */
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.discount-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(to right, #1E88E5, #0D47A1); /* Azul mais vibrante e escuro */
+  border-radius: 3px;
+  transition: width 0.5s ease-out;
+  width: 0%; /* Valor inicial importante */
+}
+
+/* Quando o desconto é ganho */
+.discount-goal[data-discount-earned="true"] .discount-progress-bar {
+  background: linear-gradient(to right, #0D47A1, #002171); /* Gradiente de azul ainda mais escuro */
+}
+
+/* Estilos responsivos para mobile */
+@media (max-width: 767px) {
+  .discount-goal {
+    padding: 12px 0;
+  }
+  
+  .discount-goal-label {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
+</style>
+
+<div class="discount-goal-container{% if classes %} {{ classes }}{% endif %}" id="discountGoalNotification">
+  <div class="discount-goal" data-cart-total="{{ cart_total }}" data-minimum-amount="{{ discount_minimum_amount }}" data-discount-earned="{{ discount_earned }}">
+    {% if discount_earned %}
+      <div class="discount-goal-label discount-goal-label--success">
+        Parabéns! Você ganhou 15% de desconto em sua compra!
+      </div>
+    {% else %}
+      <div class="discount-goal-label discount-goal-label--default">
+        <span id="discountRemainingText">Faltam {{ amount_remaining | money }} para você receber 15% OFF.</span>
+      </div>
+    {% endif %}
+    
+    <div class="discount-progress-wrapper">
+      <!-- O inline style garante que a barra seja renderizada inicialmente com o valor correto -->
+      <div class="discount-progress-bar" id="discountProgressBar" style="width: {{ percentage }}%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Esta função garante que a barra seja inicializada corretamente
+  function initializeDiscountBar() {
+    const discountGoalElement = document.querySelector('.discount-goal');
+    if (!discountGoalElement) return;
+    
+    const progressBar = document.getElementById('discountProgressBar');
+    if (!progressBar) return;
+    
+    const cartTotal = parseInt(discountGoalElement.getAttribute('data-cart-total') || '0');
+    const discountMinimumAmount = parseInt(discountGoalElement.getAttribute('data-minimum-amount') || '500000');
+    
+    // Recalcula o percentual garantindo que seja pelo menos visível
+    let percentage = (cartTotal / discountMinimumAmount) * 100;
+    percentage = Math.min(percentage, 100);
+    
+    // Garante que mesmo valores pequenos sejam visíveis (mínimo de 0.5%)
+    percentage = percentage < 0.5 && percentage > 0 ? 0.5 : percentage;
+    
+    // Aplica diretamente o estilo de largura
+    progressBar.style.width = `${percentage}%`;
+    
+    console.log('Discount bar initialized:', {
+      cartTotal,
+      discountMinimumAmount,
+      percentage: `${percentage}%`
+    });
+  }
+  
+  // Chamamos a função imediatamente e também após o DOM carregar
+  // Isto garante que a barra seja inicializada em todos os cenários
+  initializeDiscountBar();
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeDiscountBar();
+  });
+  
+  // Função para atualizar a barra de desconto quando o carrinho é atualizado
+  document.addEventListener('cart:updated', function(event) {
+    if (event.detail && event.detail.cart) {
+      updateDiscountGoal(event.detail.cart);
+    }
+  });
+  
+  document.addEventListener('cart:refresh', function(event) {
+    if (event.detail && event.detail.cart) {
+      updateDiscountGoal(event.detail.cart);
+    }
+  });
+  
+  // Função principal que atualiza a barra de desconto
+  function updateDiscountGoal(cart) {
+    const discountGoalElement = document.querySelector('.discount-goal');
+    if (!discountGoalElement) return;
+    
+    const discountMinimumAmount = 500000; // R$ 5.000,00 em centavos
+    const cartTotal = cart.total_price || 0;
+    
+    // Calcular quanto falta para atingir o objetivo
+    const amountRemaining = Math.max(0, discountMinimumAmount - cartTotal);
+    
+    // Calcular porcentagem do progresso (mínimo 0.5% para ser visível)
+    let percentage = (cartTotal / discountMinimumAmount) * 100;
+    percentage = Math.min(percentage, 100);
+    percentage = percentage < 0.5 && percentage > 0 ? 0.5 : percentage;
+    
+    // Verificar se o desconto foi ganho
+    const discountEarned = cartTotal >= discountMinimumAmount;
+    
+    // Atualizar o atributo de dados
+    discountGoalElement.setAttribute('data-discount-earned', discountEarned);
+    discountGoalElement.setAttribute('data-cart-total', cartTotal);
+    
+    // Atualizar a barra de progresso
+    const progressBar = document.getElementById('discountProgressBar');
+    if (progressBar) {
+      // Definir diretamente a largura em porcentagem
+      progressBar.style.width = `${percentage}%`;
+      console.log('Progress bar updated:', percentage + '%');
+    }
+    
+    // Atualizar o texto e visibilidade dos labels
+    const successLabel = discountGoalElement.querySelector('.discount-goal-label--success');
+    const defaultLabel = discountGoalElement.querySelector('.discount-goal-label--default');
+    
+    if (discountEarned) {
+      if (defaultLabel) defaultLabel.style.display = 'none';
+      if (successLabel) {
+        successLabel.style.display = 'block';
+      } else {
+        // Criar o rótulo de sucesso se não existir
+        const newSuccessLabel = document.createElement('div');
+        newSuccessLabel.className = 'discount-goal-label discount-goal-label--success';
+        newSuccessLabel.textContent = 'Parabéns! Você ganhou 15% de desconto em sua compra!';
+        
+        if (defaultLabel && defaultLabel.parentNode) {
+          defaultLabel.parentNode.insertBefore(newSuccessLabel, defaultLabel);
+          defaultLabel.style.display = 'none';
+        }
+      }
+    } else {
+      if (successLabel) successLabel.style.display = 'none';
+      if (defaultLabel) {
+        defaultLabel.style.display = 'block';
+        
+        // Atualizar o texto com o valor restante
+        const remainingTextElement = document.getElementById('discountRemainingText');
+        if (remainingTextElement) {
+          const formatter = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          });
+          
+          remainingTextElement.textContent = `Faltam ${formatter.format(amountRemaining/100)} para você receber 15% OFF.`;
+        }
+      } else {
+        // Criar o rótulo padrão se não existir
+        const newDefaultLabel = document.createElement('div');
+        newDefaultLabel.className = 'discount-goal-label discount-goal-label--default';
+        
+        const formatter = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        });
+        
+        newDefaultLabel.innerHTML = `<span id="discountRemainingText">Faltam ${formatter.format(amountRemaining/100)} para você receber 15% OFF.</span>`;
+        
+        if (successLabel && successLabel.parentNode) {
+          successLabel.parentNode.insertBefore(newDefaultLabel, successLabel);
+          successLabel.style.display = 'none';
+        }
+      }
+    }
+  }
+</script>

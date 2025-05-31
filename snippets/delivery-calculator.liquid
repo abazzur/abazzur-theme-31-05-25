@@ -1,0 +1,456 @@
+<script src="{{ 'lottie.min.js' | asset_url }}" defer></script>
+
+<div class="delivery-calculator">
+  <h3 class="delivery-calculator__title">Calcular prazo</h3>
+  
+  <div class="delivery-calculator__form">
+    <!-- Grupo dos 5 dígitos -->
+    <div class="delivery-calculator__input-group delivery-calculator__cep-group">
+      {% for i in (0..4) %}
+        <div class="delivery-calculator__field">
+          <input
+            type="text"
+            class="delivery-calculator__input js-cep-digit"
+            data-index="{{ i }}"
+            maxlength="1"
+            pattern="[0-9]"
+            inputmode="numeric"
+          >
+        </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Separador -->
+    <span class="delivery-calculator__separator">-</span>
+    
+    <!-- Grupo dos 3 dígitos -->
+    <div class="delivery-calculator__input-group delivery-calculator__sufix-group">
+      {% for i in (0..2) %}
+        <div class="delivery-calculator__field">
+          <input
+            type="text"
+            class="delivery-calculator__input js-sufix-digit"
+            data-index="{{ i }}"
+            maxlength="1"
+            pattern="[0-9]"
+            inputmode="numeric"
+          >
+        </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Animação "Search" -->
+    <div class="delivery-calculator__loading-search" style="width:45px; height:45px; display:none;"></div>
+  </div>
+  
+  <p class="delivery-calculator__hint">Insira seu CEP</p>
+  
+  <!-- Local em que exibimos FRETE EXPRESSO + datas -->
+  <div class="delivery-calculator__results"></div>
+</div>
+
+<style>
+.delivery-calculator {
+  width: 100%;
+  margin: 25px 0;
+}
+.delivery-calculator__title {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  color: #000;
+  margin-bottom: 20px;
+  text-align: left;
+}
+.delivery-calculator__form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.delivery-calculator__input-group {
+  display: flex;
+  border: 1px solid #E0E0E0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.delivery-calculator__cep-group { width: 225px; }
+.delivery-calculator__sufix-group { width: 135px; }
+
+.delivery-calculator__field {
+  flex: 1;
+  position: relative;
+}
+.delivery-calculator__input {
+  width: 100%;
+  height: 45px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  color: #999;
+  padding: 0;
+}
+.delivery-calculator__input:focus {
+  outline: none;
+}
+
+.delivery-calculator__field:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: #E0E0E0;
+}
+
+.delivery-calculator__separator {
+  font-size: 24px;
+  font-weight: 300;
+  color: #999;
+  display: flex;
+  align-items: center;
+}
+
+.delivery-calculator__hint {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 5px;
+}
+
+.delivery-calculator__results {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #000;
+  font-weight: 400;
+}
+
+.delivery-calculator__loading-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* NOVO CSS PARA O CARD DE RESULTADO DO FRETE */
+.shipping-card {
+  background-color: #F8F8F8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px;
+  margin-top: 1rem;
+  border-radius: 8px;
+    gap: 12px;
+  min-height: 100px;
+}
+
+/* Container da coluna esquerda (ícone + textos) */
+.shipping-card__left {
+  display: flex;
+  align-items: flex-start;
+      gap: 12px;
+}
+
+/* Container apenas do ícone */
+.shipping-card__icon {
+  flex-shrink: 0;
+}
+
+.shipping-card__icon svg {
+  width: 32px;
+  height: 32px;
+  color: #000;
+margin-right: 10px;
+}
+
+/* Container dos textos alinhados verticalmente */
+.shipping-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Título "Receba em casa" */
+.shipping-card__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0px;
+}
+
+/* "Frete expresso" e cidade */
+.shipping-card__express {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.shipping-card__city {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Data de entrega */
+.shipping-card__date {
+  color: #999;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Badge "Grátis" */
+.shipping-card__badge {
+  background-color: #EEF6EE;
+  color: #0d8756;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 4px;
+  height: fit-content;
+}
+
+/* Responsivo no mobile */
+@media (max-width: 480px) {
+  .delivery-calculator__cep-group {
+    width: 180px;
+  }
+  .delivery-calculator__sufix-group {
+    width: 108px;
+  }
+  .delivery-calculator__input {
+    font-size: 16px;
+  }
+  
+  /* Ajustes responsivos para o card de frete */
+  .shipping-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+  }
+  
+  .shipping-card__badge {
+    align-self: flex-start;
+  }
+}
+</style>
+
+<script>
+// Animação do SEARCH
+const searchAnimationData = {"v":"4.8.0","meta":{"g":"LottieFiles AE ","a":"","k":"","d":"","tc":""},"fr":25,"ip":0,"op":50,"w":500,"h":500,"nm":"24 Search","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":3,"nm":"Main Stroke width - Color Ctrl","parent":5,"sr":1,"ks":{"o":{"a":0,"k":0,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":0,"k":[0,0,0],"ix":2},"a":{"a":0,"k":[50,50,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"ef":[{"ty":5,"nm":"Stroke width","np":3,"mn":"ADBE Slider Control","ix":1,"en":1,"ef":[{"ty":0,"nm":"Slider","mn":"ADBE Slider Control-0001","ix":1,"v":{"a":0,"k":16,"ix":1}}]}],"ip":0,"op":50,"st":0,"bm":0},{"ddd":0,"ind":2,"ty":4,"nm":"Search ","parent":1,"sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":1,"k":[{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":7,"s":[220.135,217.44,0],"to":[-31.833,19.167,0],"ti":[21.657,30.876,0]},{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":17.421,"s":[107.135,212.44,0],"to":[-34.454,-49.121,0],"ti":[-45.444,6.832,0]},{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":27.842,"s":[154.135,109.44,0],"to":[63.717,-9.579,0],"ti":[-4.743,-20.555,0]},{"i":{"x":0.667,"y":1},"o":{"x":0.167,"y":0.167},"t":38.263,"s":[232.135,174.44,0],"to":[6,26,0],"ti":[2,-7.167,0]},{"t":47,"s":[220.135,217.44,0]}],"ix":2},"a":{"a":0,"k":[170.135,167.44,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[-26.394,-24.7],[24.7,-26.394],[26.394,24.7],[-24.7,26.394]],"o":[[26.394,24.7],[-24.7,26.394],[-26.394,-24.7],[24.7,-26.394]],"v":[[111.091,15.883],[114.159,108.396],[21.646,111.464],[18.578,18.951]],"c":true},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0.6,0.6,0.6,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 1","np":2,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false},{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"v":[[112.651,109.956],[170.135,167.44]],"c":false},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0.6,0.6,0.6,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 2","np":2,"cix":2,"bm":0,"ix":2,"mn":"ADBE Vector Group","hd":false}],"ip":0,"op":50,"st":0,"bm":0},{"ddd":0,"ind":3,"ty":4,"nm":"Search 2","parent":1,"td":1,"sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":1,"k":[{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":7,"s":[220.135,217.44,0],"to":[-31.833,19.167,0],"ti":[21.657,30.876,0]},{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":17.421,"s":[107.135,212.44,0],"to":[-34.454,-49.121,0],"ti":[-45.444,6.832,0]},{"i":{"x":0.833,"y":0.833},"o":{"x":0.167,"y":0.167},"t":27.842,"s":[154.135,109.44,0],"to":[63.717,-9.579,0],"ti":[-4.743,-20.555,0]},{"i":{"x":0.667,"y":1},"o":{"x":0.167,"y":0.167},"t":38.263,"s":[232.135,174.44,0],"to":[6,26,0],"ti":[2,-7.167,0]},{"t":47,"s":[220.135,217.44,0]}],"ix":2},"a":{"a":0,"k":[170.135,167.44,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[-26.394,-24.7],[24.7,-26.394],[26.394,24.7],[-24.7,26.394]],"o":[[26.394,24.7],[-24.7,26.394],[-26.394,-24.7],[24.7,-26.394]],"v":[[111.091,15.883],[114.159,108.396],[21.646,111.464],[18.578,18.951]],"c":true},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0.20000000298,0.800000011921,0.800000011921,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 1","np":2,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false},{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,0],[0,0]],"o":[[0,0],[0,0]],"v":[[112.651,109.956],[170.135,167.44]],"c":false},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0,0,0,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 2","np":2,"cix":2,"bm":0,"ix":2,"mn":"ADBE Vector Group","hd":false},{"ty":"fl","c":{"a":0,"k":[1,0,0,1],"ix":4},"o":{"a":0,"k":100,"ix":5},"r":1,"bm":0,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill","hd":false}],"ip":0,"op":50,"st":0,"bm":0},{"ddd":0,"ind":4,"ty":4,"nm":"Icon","parent":1,"tt":2,"sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":1,"k":[{"i":{"x":[0.49],"y":[1]},"o":{"x":[0.51],"y":[0]},"t":0,"s":[0]},{"i":{"x":[0.49],"y":[1]},"o":{"x":[0.51],"y":[0]},"t":9,"s":[-17.573]},{"i":{"x":[0.49],"y":[1]},"o":{"x":[0.51],"y":[0]},"t":18,"s":[18.806]},{"i":{"x":[0.49],"y":[1]},"o":{"x":[0.51],"y":[0]},"t":29,"s":[-9.535]},{"i":{"x":[0.49],"y":[1]},"o":{"x":[0.51],"y":[0]},"t":40,"s":[4.819]},{"t":48,"s":[0]}],"ix":10},"p":{"a":0,"k":[9.422,217.359,0],"ix":2},"a":{"a":0,"k":[-40.578,167.359,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,0],[0,18.294],[0,0],[61.728,0],[0,0],[0,-61.728],[0,0],[-11.32,-19.226],[0,0],[0,0]],"o":[[7.681,-16.489],[0,0],[0,-61.728],[0,0],[-61.728,0],[0,0],[0,22.311],[0,0],[0,0],[0,0]],"v":[[58.896,-1.454],[71.19,-55.515],[71.19,-55.515],[-40.578,-167.283],[-40.578,-167.283],[-152.347,-55.515],[-152.347,-55.051],[-135.057,8.392],[-41.457,167.359],[5.741,88.383]],"c":true},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0.6,0.6,0.6,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 1","np":2,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false},{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[0,-29.013],[29.013,0],[0,29.013],[-29.013,0]],"o":[[0,29.013],[-29.013,0],[0,-29.013],[29.013,0]],"v":[[11.954,-53.264],[-40.578,-0.732],[-93.111,-53.264],[-40.578,-105.797]],"c":true},"ix":2},"nm":"Path 1","mn":"ADBE Vector Shape - Group","hd":false},{"ty":"st","c":{"a":0,"k":[0.6,0.6,0.6,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":16,"ix":5,"x":"var $bm_rt;\n$bm_rt = thisComp.layer('Main Stroke width - Color Ctrl').effect('Stroke width')('Slider');"},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Group 2","np":2,"cix":2,"bm":0,"ix":2,"mn":"ADBE Vector Group","hd":false}],"ip":0,"op":50,"st":0,"bm":0},{"ddd":0,"ind":5,"ty":3,"nm":"Zero | troke width - Color Ctrl","sr":1,"ks":{"o":{"a":0,"k":0,"ix":11},"r":{"a":0,"k":0,"ix":10},"p":{"a":0,"k":[250,250,0],"ix":2},"a":{"a":0,"k":[0,0,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"ip":0,"op":50,"st":0,"bm":0}],"markers":[]};
+
+// === 1) Tabela de prazos fixos: [minDays, maxDays] ===
+const PRAZOS = {
+  capitais: {
+    "ARACAJU": [5, 9],
+    "BELEM": [5, 10],
+    "BELO HORIZONTE": [4, 9],
+    "BOA VISTA": [5, 10],
+    "BRASILIA": [5, 10],
+    "CAMPO GRANDE": [5, 10],
+    "CUIABA": [5, 10],
+    "CURITIBA": [5, 10],
+    "FLORIANOPOLIS": [5, 9],
+    "FORTALEZA": [5, 9],
+    "GOIANIA": [5, 10],
+    "ITAJAI": [5, 9],
+    "JOAO PESSOA": [5, 9],
+    "MACAPA": [5, 10],
+    "MACEIO": [5, 9],
+    "MANAUS": [5, 10],
+    "NATAL": [5, 9],
+    "PALMAS": [5, 10],
+    "PARANAGUA": [4, 9],
+    "PORTO ALEGRE": [5, 10],
+    "PORTO VELHO": [5, 10],
+    "RECIFE": [5, 9],
+    "RIO BRANCO": [5, 10],
+    "RIO DE JANEIRO": [5, 9],
+    "RIO GRANDE": [5, 9],
+    "SALVADOR": [5, 9],
+    "SANTOS": [4, 9],
+    "SAO LUIS": [5, 9],
+    "SAO PAULO": [4, 8],
+    "SUAPE": [5, 9],
+    "TERESINA": [5, 9],
+    "VITORIA": [5, 10]
+  },
+  rest_SP: [4, 9],
+  others: [7, 11]
+};
+
+// === 2) Script principal ===
+document.addEventListener('DOMContentLoaded', () => {
+  // Seletores
+  const cepInputs = document.querySelectorAll('.js-cep-digit');
+  const sufixInputs = document.querySelectorAll('.js-sufix-digit');
+  const loadingSearchDiv = document.querySelector('.delivery-calculator__loading-search');
+  const resultsDiv = document.querySelector('.delivery-calculator__results');
+
+  // Animação do SEARCH
+  let searchLottie = lottie.loadAnimation({
+    container: loadingSearchDiv,
+    renderer: 'svg',
+    loop: true,
+    autoplay: false,
+    animationData: searchAnimationData
+  });
+
+  // === Avanço automático CEP (5 campos) ===
+  cepInputs.forEach((input, idx) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '');
+      if (input.value) {
+        if (idx < 4) {
+          cepInputs[idx + 1].focus();
+        } else {
+          // foca no primeiro do sufix
+          sufixInputs[0].focus();
+        }
+      }
+    });
+    // backspace
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) {
+        cepInputs[idx - 1].focus();
+      }
+    });
+  });
+
+  // === Avanço automático sufix (3 campos) ===
+  sufixInputs.forEach((input, idx) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '');
+      if (input.value && idx < 2) {
+        sufixInputs[idx + 1].focus();
+      }
+      if (idx === 2 && input.value) {
+        const full = getFullCep();
+        if (full.length === 8) {
+          iniciarLoading();
+        }
+      }
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) {
+        sufixInputs[idx - 1].focus();
+      }
+    });
+  });
+
+  // Retorna CEP completo
+  function getFullCep() {
+    let partA = '';
+    cepInputs.forEach(i => partA += (i.value || ''));
+    let partB = '';
+    sufixInputs.forEach(i => partB += (i.value || ''));
+    return partA + partB;
+  }
+
+  // === Exibe animação Search por 2.5s e depois faz viaCEP ===
+  function iniciarLoading() {
+    resultsDiv.innerHTML = '';
+    loadingSearchDiv.style.display = 'flex';
+    searchLottie.goToAndPlay(0, true);
+
+    setTimeout(() => {
+      searchLottie.stop();
+      loadingSearchDiv.style.display = 'none';
+      buscarPrazo();
+    }, 2500);
+  }
+
+// === Chama viaCEP e exibe resultado ===
+  async function buscarPrazo() {
+    let fullCep = getFullCep();
+    if (fullCep.length < 8) return;
+    try {
+      const url = `https://viacep.com.br/ws/${fullCep}/json/`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('ViaCEP error');
+      const data = await resp.json();
+      if (data.erro) throw new Error('CEP inválido');
+      const uf = (data.uf || '').toUpperCase();
+      const city = (data.localidade || '').toUpperCase();
+      let [minDays, maxDays] = PRAZOS.others; // Default
+      if (uf === 'SP') {
+        if (city in PRAZOS.capitais) {
+          [minDays, maxDays] = PRAZOS.capitais[city];
+        } else {
+          [minDays, maxDays] = PRAZOS.rest_SP;
+        }
+      } else if (city in PRAZOS.capitais) {
+        [minDays, maxDays] = PRAZOS.capitais[city];
+      }
+      const dateMin = addDays(minDays);
+      const dateMax = addDays(maxDays);
+      const strMin = formatDateBR(dateMin);
+      const strMax = formatDateBR(dateMax);
+      exibirResultado(data.localidade, data.uf, strMin, strMax);
+    } catch(e) {
+      resultsDiv.innerHTML = '';
+    }
+  }
+  
+  // Retorna nova data somando apenas dias úteis (pula sábados e domingos)
+  function addDays(daysToAdd) {
+    const dt = new Date();
+    let addedDays = 0;
+    
+    while (addedDays < daysToAdd) {
+      dt.setDate(dt.getDate() + 1);
+      
+      // Verifica se não é fim de semana (0 = Domingo, 6 = Sábado)
+      if (dt.getDay() !== 0 && dt.getDay() !== 6) {
+        addedDays++;
+      }
+    }
+    
+    return dt;
+  }
+  
+  // Formata a data em pt-BR
+  function formatDateBR(d) {
+    return d.toLocaleDateString('pt-BR', {
+      day: 'numeric',
+      month: 'long',
+    });
+  }
+  
+  // === Exibe FRETE EXPRESSO + intervalo de data ===
+  function exibirResultado(localidade, uf, dateStrMin, dateStrMax) {
+    resultsDiv.innerHTML = `
+      <div class="shipping-card">
+        <div class="shipping-card__left">
+          <!-- Ícone de casa isolado -->
+          <div class="shipping-card__icon">
+            <svg id="Layer_1" enable-background="new 0 0 30 30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="m21.367 24.493h-2.656c-.414 0-.75.336-.75.75s.336.75.75.75h2.656c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z"/>
+              <path d="m29.014 10.952-12.469-8.447c-.93-.633-2.154-.633-3.084 0l-2.375 1.609v-.281c0-1.703-1.38-3.083-3.083-3.083s-3.083 1.38-3.083 3.083v4.458l-3.929 2.662c-.462.313-.738.834-.738 1.392v3.464c0 .93.755 1.684 1.685 1.683.322 0 .638-.093.909-.267l1.073-.692v9.058c.002 2.02 1.639 3.657 3.659 3.659h19.668c1.379-.003 2.497-1.121 2.5-2.5v-3.967-.014-3.223-.015-1.131-.014-6.04c.001-.557-.273-1.079-.733-1.394zm-22.594-7.119c0-.874.709-1.583 1.583-1.583s1.583.709 1.583 1.583v1.3l-3.166 2.142zm8.671 23.914h-7.512c-1.191-.001-2.156-.965-2.159-2.156h.002v-10.024l9.581-6.175 7.784 5.015h-5.366c-1.379.003-2.497 1.121-2.5 2.5v9.972c.001.298.059.592.17.868zm8.855-11.84v2.416l-1-.561c-.383-.215-.85-.215-1.233 0l-1 .561.009-2.416zm3.306 11.839h-9.961c-.48.001-.871-.388-.873-.868v-9.968c0-.552.448-1 1-1h1.8v2.838c0 .693.562 1.254 1.254 1.254.216 0 .428-.056.616-.162l1.242-.7 1.242.7c.388.222.865.218 1.249-.01.386-.223.623-.636.621-1.082v-2.841h1.8c.552 0 1 .448 1 1v9.836l.01.003c0 .552-.448 1-1 1zm1-13.124c-.317-.141-.659-.214-1.006-.215h-1.688l-9.885-6.368c-.408-.262-.932-.262-1.34 0l-12.298 7.924c-.055.038-.128.041-.186.007-.062-.03-.101-.092-.1-.161v-3.464c0-.06.03-.117.08-.151l4.2-2.848c.017-.01.037-.014.054-.026l4.666-3.164c.008 0 .011-.015.019-.021l3.535-2.388c.423-.286.977-.286 1.4 0l12.468 8.447c.051.034.081.091.081.152z"/>
+            </svg>
+          </div>
+          
+          <!-- Bloco de informações com os textos alinhados -->
+          <div class="shipping-card__info">
+            <div class="shipping-card__title">Receba em casa</div>
+            
+            <div class="shipping-card__express">
+              Frete expresso <span class="shipping-card__city">(${localidade})</span>
+            </div>
+            
+            <div class="shipping-card__date">
+              Entrega entre ${dateStrMin} a ${dateStrMax}.
+            </div>
+          </div>
+        </div>
+
+        <div class="shipping-card__badge">Grátis</div>
+      </div>
+    `;
+  }
+});
+</script>

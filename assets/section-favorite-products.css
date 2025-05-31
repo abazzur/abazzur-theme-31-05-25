@@ -1,0 +1,97 @@
+@media (min-width: 768px) {
+  .favorite-products {
+    width: fit-content;
+  }
+}
+.favorite-products .swiper {
+  max-width: 100%;
+}
+.favorite-products .swiper-wrapper {
+  box-sizing: border-box;
+}
+.favorite-products__products, .favorite-products__media {
+  min-height: var(--slide-height);
+}
+@media (min-width: 768px) {
+  .favorite-products__products, .favorite-products__media {
+    width: 50vw;
+  }
+}
+.favorite-products__testimonials {
+  --py: 8rem;
+  --px: 6rem;
+  padding: var(--py) var(--px);
+  transition: background-color 0.3s;
+}
+@media (min-width: 768px) {
+  .favorite-products__testimonials {
+    width: 42vw;
+  }
+}
+.favorite-products__testimonials .swiper-controls {
+  --swiper-controls-top-offset: 0;
+}
+@media (max-width: 1023.98px) {
+  .favorite-products__testimonials {
+    --py: 4rem;
+    --px: 3.2rem;
+  }
+}
+@media (max-width: 767.98px) {
+  .favorite-products__testimonials {
+    --py: 3.2rem;
+    --px: 1.5rem;
+  }
+}
+.favorite-products .testimonial__author {
+  margin-top: 4rem;
+}
+@media (max-width: 767.98px) {
+  .favorite-products .testimonial__author {
+    margin-top: 2.4rem;
+  }
+}
+@media (min-width: 768px) {
+  .favorite-products--height-small {
+    --slide-height: 54rem;
+  }
+  .favorite-products--height-medium {
+    --slide-height: 63rem;
+  }
+  .favorite-products--height-large {
+    --slide-height: 72rem;
+  }
+}
+@media (min-width: 768px) {
+  .favorite-products:not(.favorite-products--height-adapt) .favorite-products__products:before {
+    display: none;
+  }
+}
+.no-js .favorite-products {
+  display: block;
+}
+
+.favorite-product__product {
+  padding-block: 6rem;
+}
+.favorite-product__product .product-card {
+  width: min(30rem, 65%);
+}
+.favorite-product__product .product-card-style-card {
+  height: auto;
+}
+.favorite-product__product .product-card-style-card .product-card__wrapper {
+  padding: 1.6rem;
+}
+@media (max-width: 767.98px) {
+  .favorite-product__product .product-card-style-card .product-card__wrapper {
+    padding: 1.2rem;
+  }
+}
+.favorite-product__product .product-card-style-card .product-card__image-wrapper {
+  border-radius: var(--pcard-radius);
+}
+.favorite-product__product .product-card-style-card .product-card__info {
+  padding-bottom: 0;
+  padding-inline: 0;
+}

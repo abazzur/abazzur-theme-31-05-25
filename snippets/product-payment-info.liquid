@@ -1,0 +1,41 @@
+{%- if block.settings.heading != blank or block.settings.description != blank or block.settings.show_payment_icons -%}
+  <div class="product__payment-info flex flex-col gap-4 blocks-radius color-{{ block.settings.color_scheme }}">
+    {%- if block.settings.heading != blank -%}
+      <div class="product__promotion-alert-heading {{ block.settings.heading_size }}">
+        {{ block.settings.heading }}
+      </div>
+    {%- endif -%}
+    {%- if block.settings.show_payment_icons -%}
+      <span class="visually-hidden">{{ 'general.payment.methods' | t }}</span>
+      <ul class="list flex flex-wrap" role="list">
+        {%- for type in shop.enabled_payment_types -%}
+          <li class="flex items-center">
+            {{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    {%- if block.settings.description != blank -%}
+      <div class="product__promotion-alert-heading rte text-subtext">
+        {{ block.settings.description }}
+      </div>
+    {%- endif -%}
+    
+    <!-- Ícones de pagamento personalizados -->
+    <div class="custom-payment-icons mt-2">
+      <span class="visually-hidden">Formas de pagamento aceitas</span>
+      <ul class="list flex flex-wrap gap-0.5 items-center justify-start" role="list">
+                <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-visa.svg" alt="Visa" width="28" height="28" loading="lazy"></li>
+                <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-mastercard.svg" alt="Mastercard" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-amex.svg" alt="American Express" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-diners.svg" alt="Diners" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-discover.svg" alt="Discover" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-aura.svg" alt="Aura" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-hipercard.svg" alt="Hipercard" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-elo.svg" alt="Elo" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-hiper.svg" alt="Hiper" width="28" height="28" loading="lazy"></li>
+        <li class="payment-icon"><img src="https://icons.yampi.me/svg/card-pix.svg" alt="Pix" width="28" height="28" loading="lazy"></li>
+      </ul>
+    </div>
+  </div>
+{%- endif -%}

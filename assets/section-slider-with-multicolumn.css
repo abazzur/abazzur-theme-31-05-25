@@ -1,0 +1,29 @@
+.multicolumn__slider .content-overlay {
+  padding-bottom: 6rem;
+}
+@media (min-width: 1024px) {
+  .multicolumn__slider .content-overlay {
+    padding-bottom: 8rem;
+  }
+}
+@media (max-width: 767.98px) {
+  .multicolumn__slider {
+    position: static;
+  }
+}
+
+.multicolumn-slider .swiper-pagination {
+  --color-swiper-controls: var(--color-foreground);
+}
+
+.multicolumn__info {
+  bottom: 3rem;
+  padding: 0 3rem;
+  --text-margin-top: 0.8rem;
+}
+@media (max-width: 767.98px) {
+  .multicolumn__info {
+    bottom: 2rem;
+    padding: 0 2rem;
+  }
+}

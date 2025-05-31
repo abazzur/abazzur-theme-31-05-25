@@ -1,0 +1,33 @@
+{%- liquid
+  assign discount_minimum_amount = 500000
+  assign total_price = cart.total_price | plus: 0
+  assign percentage_complete = total_price | times: 100 | divided_by: discount_minimum_amount
+  
+  if percentage_complete > 100
+    assign percentage_complete = 100
+  endif
+  
+  assign amount_left = discount_minimum_amount | minus: total_price
+-%}
+
+{%- capture left_to_spend -%}
+  <strong data-discount-left-to-spend>{{ amount_left | money }}</strong>
+{%- endcapture -%}
+
+<discount-progress-bar
+  data-cart-total="{{ total_price }}"
+  data-minimum-amount="{{ discount_minimum_amount }}"
+  data-percentage="{{ percentage_complete }}"
+  class="discount-progress-goal grid gap-2{% if classes %} {{ classes }}{% endif %} no-js-hidden"
+>
+  <span class="discount-progress-goal__label discount-progress-goal__label--success">
+    <span class="discount-badge">15% OFF</span> Parabéns! Você ganhou 15% de desconto em sua compra!
+  </span>
+  <span class="discount-progress-goal__label discount-progress-goal__label--default">
+    <span class="discount-badge">15% OFF</span> Adicione mais {{ left_to_spend }} para ganhar 15% de desconto em sua compra
+  </span>
+  <progress-bar
+    class="discount-progress-bar"
+    style="--progress-width: {{ percentage_complete }}%"
+  ></progress-bar>
+</discount-progress-bar>

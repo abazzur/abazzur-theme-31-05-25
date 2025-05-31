@@ -1,0 +1,1000 @@
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+<div
+  id="ProductInfo-{{ section.id }}"
+  data-section="{{ section.id }}"
+  data-url="{{ product.url }}"
+  class="product__info-container{% if enable_sticky_info %} sticky-element{% endif %}"
+>
+  <div class="product__blocks accordion-parent">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign block_classes = 'product__block product__block--' | append: block.type
+        if block.settings.show_below_product_media
+          assign block_classes = block_classes | append: ' block md:hidden'
+        endif
+      -%}
+      {%- case block.type -%}
+        {%- when '@app' -%}
+          <div class="{{ block_classes }}">
+            {% render block %}
+          </div>
+        {%- when 'divider' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            <div class="product__divider no-empty"></div>
+          </div>
+        
+{%- when 'promotion_alert' -%}
+  {%- capture rgb -%}
+    {{ block.settings.text_color.red }},{{ block.settings.text_color.green }},{{ block.settings.text_color.blue }}
+  {%- endcapture -%}
+
+  <div
+    class="{{ block_classes }}"
+    {{ block.shopify_attributes }}
+    style="
+      color: {{ block.settings.text_color }};
+      --color-foreground: {{ rgb }};
+      --color-link: {{ rgb }};
+      --color-button-text: {{ rgb }};
+    "
+  >
+    {%- if block.settings.heading != blank or block.settings.description != blank -%}
+      <!-- Mantém <product-promotion-alert> para o X fechar via script do tema -->
+      <product-promotion-alert
+        class="cashback-card blocks-radius relative"
+        style="
+          background-color: #EEF6EE;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+          padding: 22px;
+          position: relative;
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          min-height: 100px;
+        "
+      >
+        <!-- Ícone de Cashback (à esquerda) -->
+        <div style="width: 32px; height: 32px; flex-shrink: 0;">
+          <svg
+            viewBox="0 0 24 24"
+            style="width: 100%; height: 100%; fill: currentColor;"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M5 3.5C6.9 1.9 9.3.999 12 .999 18.1.999 23 5.9 23 12s-4.9 11-11 11S1 18.1 1 12c0-.6.4-1 1-1s1 .4 1 1c0 5 4 9 9 9s9-4 9-9-4-9-9-9c-2.1 0-4.1.7-5.7 2H9c.6 0 1 .4 1 1s-.4 1-1 1H5c-.6 0-1-.4-1-1v-4c0-.6.4-1 1-1s1 .4 1 1zm8 4.5c0-.6-.4-1-1-1s-1 .4-1 1v.1c-1.1.2-2 1.2-2 2.4 0 1.4 1.1 2.5 2.5 2.5h1c.3 0 .5.2.5.5s-.2.5-.5.5h-.4c-.6 0-1.1-.1-1.6-.4-.5-.2-1.1 0-1.3.4-.2.5 0 1.1.4 1.3.4.2.9.4 1.4.5v.2c0 .6.4 1 1 1s1-.4 1-1v-.1c1.1-.2 2-1.2 2-2.4 0-1.4-1.1-2.5-2.5-2.5h-1c-.3 0-.5-.2-.5-.5s.2-.5.5-.5h.4c.6 0 1.1.1 1.6.4.5.2 1.1 0 1.3-.4.2-.5 0-1.1-.4-1.3-.4-.3-.9-.5-1.4-.6z"/>
+          </svg>
+        </div>
+
+        <!-- Textos (centro) -->
+        <div style="flex-grow: 1;">
+          <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0;">
+            {{ block.settings.heading }}
+          </div>
+          <div style="font-size: 1rem; margin-bottom: 1rem;">
+            {{ block.settings.description }}
+          </div>
+          <!-- Valor do Cashback, agora com ID para o JS -->
+          <div
+            id="CashbackValue"
+            style="font-size: 1.25rem; font-weight: 700;"
+          >
+            +{{ product.selected_or_first_available_variant.price | times: 0.05 | money }}
+            <span style="font-size: 1rem; font-weight: 400;">voltam para você</span>
+          </div>
+        </div>
+
+        <!-- Botão fechar (X) no canto superior direito -->
+        <button
+          class="btn--small btn--icon no-js-hidden"
+          aria-label="{{ 'accessibility.close' | t }}"
+          style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            box-shadow: none;
+            cursor: pointer;
+          "
+        >
+          {%- render 'icon-close', size: 'small' -%}
+        </button>
+      </product-promotion-alert>
+    {%- endif -%}
+              
+  </div>
+        {%- when 'payment_info' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {%- render 'product-payment-info', block: block -%}
+          </div>
+        {%- when 'text' -%}
+          <div class="{{ block_classes }} rte" {{ block.shopify_attributes }}>
+            <p class="product__text inline-richtext m-0{% if block.settings.text_style == 'uppercase' %} text-upper{% elsif block.settings.text_style == 'subtitle' %} text-upper text-subtext{% endif %}">
+              {{- block.settings.text -}}
+            </p>
+          </div>
+        {%- when 'title' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            <h1 class="product__title {{ block.settings.heading_size }}">{{ product.title | escape }}</h1>
+            <a href="{{ product.url }}" class="product__title">
+              <h2 class="h1">
+                {{ product.title | escape }}
+              </h2>
+            </a>
+          </div>
+
+{%- when 'price' -%}
+  <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+    {%- comment %}
+      Lógica para pegar a variante inicial e calcular 10% OFF
+    {%- endcomment %}
+    {%- assign default_variant = product.selected_or_first_available_variant -%}
+    {%- assign original_price_cents = default_variant.price -%}
+    {%- assign discount_price_cents = original_price_cents | times: 0.9 -%} 
+    {%- assign discount_price_formatted = discount_price_cents | money -%}
+    {%- assign original_price_formatted = original_price_cents | money -%}
+    {%- assign monthly_cents = original_price_cents | times: 0.083333 -%}
+    {%- assign monthly_money = monthly_cents | money -%}
+
+    <!-- PREÇO COM 10% OFF -->
+    <span
+      id="PixPrice-{{ section.id }}"
+      style="
+        font-size: 3rem;     /* Tamanho maior do preço principal */
+        font-weight: 700;    /* Fonte mais espessa */
+        margin-right: 0px;  /* Espaço à direita antes de 'no Pix' */
+      "
+    >
+      {{ discount_price_formatted }}
+    </span>
+
+    <!-- TEXTO “no Pix” -->
+    <span
+      style="
+        font-size: 1.2rem;   /* Um pouco menor que o preço principal */
+        font-weight: 500;
+        margin-right: 8px;   /* Espaço antes do badge */
+      "
+    >
+      no Pix
+    </span>
+
+    <!-- BADGE “-10%” AO LADO DIREITO -->
+    <span
+      id="PixBadge-{{ section.id }}"
+      style="
+        background-color: #C4301C; 
+        color: #fff; 
+      font-family: Inter;
+        font-weight: 600;
+        font-size: 1rem; 
+        padding: 4px 8px; 
+        border-radius: 4px; 
+      "
+    >
+      -10%
+    </span>
+
+    <!-- PREÇO ORIGINAL E PARCELAS (MESMA LINHA) -->
+    <div style="margin-top: 4px; font-size: 1.2rem;">
+      <!-- PREÇO ORIGINAL (SEM riscar, em preto) -->
+      <span
+        id="OriginalPrice-{{ section.id }}"
+        style="
+          color: #000;
+          font-weight: 400;
+        font-size: 1.2rem;
+        "
+      >
+        {{ original_price_formatted }}
+      </span>
+
+      <!-- PARCELAMENTO -->
+      <span
+        id="Installments-{{ section.id }}"
+        style="
+          color: #000c;
+                  font-weight: 400;
+                font-size: 1.2rem;
+        "
+      >
+        em até 12x de {{ monthly_money }} sem juros
+      </span>
+    </div>
+  </div>
+            
+            {%- if product.quantity_price_breaks_configured? -%}
+              <div class="volume-pricing-note text-subtext" id="VolumeNote-{{ section.id }}">
+                <span>{{ 'products.product.volume_pricing.note' | t }}</span>
+              </div>
+            {%- endif -%}
+            <div class="product__tax rte">
+              {%- if cart.taxes_included -%}
+                {{ 'products.product.include_taxes' | t }}
+              {%- endif -%}
+              {%- if shop.shipping_policy.body != blank -%}
+                {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+              {%- endif -%}
+            </div>
+            {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
+            {%- form 'product', product, id: product_form_installment_id, class: 'installment' -%}
+              <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+              {{ form | payment_terms }}
+            {%- endform -%}
+          </div>
+        {%- when 'inventory' -%}
+          <div
+            class="{{ block_classes }}{% if block.settings.text_style == 'uppercase' %} text-upper{% elsif block.settings.text_style == 'subtitle' %} text-upper text-subtext{% endif %}{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} invisible{% endif %}"
+            {{ block.shopify_attributes }}
+            id="Inventory-{{ section.id }}"
+            role="status"
+          >
+            {%- if product.selected_or_first_available_variant.inventory_management == 'shopify' -%}
+              {%- liquid
+                assign inventory_quantity = product.selected_or_first_available_variant.inventory_quantity
+
+                if inventory_quantity > 0
+                  if inventory_quantity <= block.settings.inventory_threshold
+                    assign inventory_status = 'low-stock'
+                    if block.settings.show_inventory_quantity
+                      if inventory_quantity == 1
+                        assign inventory_message = 'products.product.inventory_low_stock_one_item_html' | t: quantity: inventory_quantity
+                      else
+                        assign inventory_message = 'products.product.inventory_low_stock_many_items_html' | t: quantity: inventory_quantity
+                      endif
+                    else
+                      assign inventory_message = 'products.product.inventory_low_stock' | t
+                    endif
+                  else
+                    assign inventory_status = 'in-stock'
+                    if block.settings.show_inventory_quantity
+                      assign inventory_message = 'products.product.inventory_in_stock_show_count_html' | t: quantity: inventory_quantity
+                    else
+                      assign inventory_message = 'products.product.inventory_in_stock' | t
+                    endif
+                  endif
+                else
+                  if product.selected_or_first_available_variant.inventory_policy == 'continue'
+                    assign inventory_status = 'in-stock'
+                    assign inventory_message = 'products.product.inventory_out_of_stock_continue_selling' | t
+                  else
+                    assign inventory_status = 'out-of-stock'
+                    assign inventory_message = 'products.product.inventory_out_of_stock' | t
+                  endif
+                endif
+              %}
+              <p class="product__inventory product__inventory--{{ inventory_status }} font-body-bolder">
+                <span class="product__inventory-icon"></span>
+                <span class="product__inventory-text">{{- inventory_message -}}</span>
+              </p>
+              {%- if inventory_status == 'low-stock' and inventory_quantity < block.settings.inventory_threshold -%}
+                <progress-bar
+                  class="product__inventory-stock-bar progress-bar"
+                  data-value="{{ inventory_quantity }}"
+                  data-max="{{ block.settings.inventory_threshold }}"
+                ></progress-bar>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        {%- when 'description' -%}
+          {%- if product.description != blank -%}
+            <div class="{{ block_classes }} rte text-subtext" {{ block.shopify_attributes }}>
+              {{ product.description }}
+            </div>
+          {%- endif -%}
+        {%- when 'meta' -%}
+          {%- if block.settings.show_vendor
+            or block.settings.show_product_type
+            or block.settings.show_barcode
+          -%}
+            <div
+              class="{{ block_classes }} flex flex-wrap gap-x-3 gap-y-2 text-subtext"
+              {{ block.shopify_attributes }}
+              style="--color-link: {{ block.settings.link_color.red }},{{ block.settings.link_color.green }},{{ block.settings.link_color.blue }};"
+            >
+              {%- if block.settings.show_vendor -%}
+                <p
+                  class="product__meta product__vendor"
+                  id="Vendor-{{ section.id }}"
+                  role="status"
+                >
+                  <span>{{ 'products.product.vendor' | t }}:</span>
+                  <a
+                    href="/collections/vendors?q={{ product.vendor | url_encode }}"
+                    class="btn--link font-body-bolder"
+                  >
+                    {{- product.vendor -}}
+                  </a>
+                </p>
+              {%- endif -%}
+              {%- if block.settings.show_product_type and product.type != blank -%}
+                <p
+                  class="product__meta product__type"
+                  id="Type-{{ section.id }}"
+                  role="status"
+                >
+                  <span>{{ 'products.product.type' | t }}:</span>
+                  <a
+                    href="/collections/types?q={{ product.type | url_encode }}"
+                    class="btn--link font-body-bolder"
+                  >
+                    {{- product.type -}}
+                  </a>
+                </p>
+              {%- endif -%}
+              {%- if block.settings.show_sku -%}
+                <p
+                  role="status"
+                >
+                  {%- if product.selected_or_first_available_variant.sku != blank -%}
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+              {%- if block.settings.show_barcode -%}
+                <p
+                  class="product__meta product__barcode{% if product.selected_or_first_available_variant.barcode.size == 0 %} hidden{% endif %}"
+                  id="Barcode-{{ section.id }}"
+                  role="status"
+                >
+                  {%- if product.selected_or_first_available_variant.barcode != blank -%}
+                    <span>{{ 'products.product.barcode' | t }}:</span>
+                    <span>{{- product.selected_or_first_available_variant.barcode -}}</span>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- when 'custom_liquid' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {{ block.settings.custom_liquid }}
+          </div>
+        {%- when 'collapsible_tab' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {%- render 'product-collapsible-tab', block: block, section_id: section.id -%}
+          </div>
+
+{%- when 'ficha_tecnica' -%}
+          <!-- ================== BLOCO NOVO: FICHA TÉCNICA ================== -->
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            <details
+              class="accordion-details"
+              {%- if block.settings.default_open -%}
+                open
+                aria-expanded="true"
+              {%- else -%}
+                aria-expanded="false"
+              {%- endif -%}
+            >
+              <summary class="accordion-details__summary flex items-center justify-between focus-inset">
+                <div class="flex items-center gap-2">
+                  {%- if block.settings.icon != 'none' -%}
+                    {% render 'icons', icon: block.settings.icon, size: 'extra-large' %}
+                  {%- endif -%}
+                  <h2 class="h4 inline-richtext">
+                    {{ block.settings.heading }}
+                  </h2>
+                </div>
+                {% render 'icon-plus-toggle' %}
+              </summary>
+
+              <div class="accordion-details__content rte">
+                <table style="width:100%; border-collapse:collapse;">
+
+                  {%- comment %}
+                    Para remover colchetes [] e aspas "" em campos multi-valor,
+                    usamos: | remove: '[' | remove: ']' | remove: '"'
+                    Se o metafield for texto único, pode não precisar.
+                  {% endcomment %}
+                  
+{%- assign color_values = '' -%}
+
+{%- if product.variants.size > 1 -%}
+    {%- for variant in product.variants -%}
+        {%- if variant.option1 != blank -%}
+            {%- unless color_values contains variant.option1 -%}
+                {%- if color_values == '' -%}
+                    {%- assign color_values = variant.option1 -%}
+                {%- else -%}
+                    {%- assign color_values = color_values | append: ', ' | append: variant.option1 -%}
+                {%- endif -%}
+            {%- endunless -%}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endif -%}
+
+<tr>
+    <th>Cor</th>
+    <td>{{ color_values | default: "N/A" }}</td>
+</tr>       
+
+                  {%- if product.metafields.custom.material.value != blank %}
+                  <tr>
+                    <th style="text-align:left;padding:5px;border-bottom:1px solid #ccc;">Material</th>
+                    <td style="padding:5px;border-bottom:1px solid #ccc;">
+                      {{ product.metafields.custom.material.value | remove: '[' | remove: ']' | remove: '"' }}
+                    </td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.acabamento.value != blank %}
+                  <tr>
+                    <th>Acabamento</th>
+                    <td>
+                      {{ product.metafields.custom.acabamento.value | remove: '[' | remove: ']' | remove: '"' }}
+                    </td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.estilo.value != blank %}
+                  <tr>
+                    <th>Estilo</th>
+                    <td>{{ product.metafields.custom.estilo.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.ambientes_indicados.value != blank %}
+                  <tr>
+                    <th>Ambientes indicados</th>
+                    <td>{{ product.metafields.custom.ambientes_indicados.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.altura.value != blank %}
+                  <tr>
+                    <th>Altura</th>
+                    <td>{{ product.metafields.custom.altura.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.largura.value != blank %}
+                  <tr>
+                    <th>Largura</th>
+                    <td>{{ product.metafields.custom.largura.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.comprimento.value != blank %}
+                  <tr>
+                    <th>Comprimento</th>
+                    <td>{{ product.metafields.custom.comprimento.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.diametro.value != blank %}
+                  <tr>
+                    <th>Diâmetro Ø</th>
+                    <td>{{ product.metafields.custom.diametro.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.espaco_adequado.value != blank %}
+                  <tr>
+                    <th>Espaço adequado</th>
+                    <td>{{ product.metafields.shopify.espaco_adequado.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.uso_recomendado.value != blank %}
+                  <tr>
+                    <th>Uso recomendado</th>
+                    <td>{{ product.metafields.custom.uso_recomendado.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tensao.value != blank %}
+                  <tr>
+                    <th>Tensão</th>
+                    <td>{{ product.metafields.custom.tensao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.soquete.value != blank %}
+                  <tr>
+                    <th>Soquete</th>
+                    <td>{{ product.metafields.custom.soquete.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.bulb_type.value != blank %}
+                  <tr>
+                    <th>Tipo de lâmpada</th>
+                    <td>{{ product.metafields.shopify.bulb_type.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tipo_de_lampada.value != blank %}
+                  <tr>
+                    <th>Modelo da lâmpada</th>
+                    <td>{{ product.metafields.custom.tipo_de_lampada.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.bulb_size.value != blank %}
+                  <tr>
+                    <th>Tamanho da lâmpada</th>
+                    <td>{{ product.metafields.shopify.bulb_size.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.quantidade_de_lampadas.value != blank %}
+                  <tr>
+                    <th>Quantidade de lâmpadas</th>
+                    <td>{{ product.metafields.custom.quantidade_de_lampadas.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.acompanha_lampadas.value != blank %}
+                  <tr>
+                    <th>Acompanha lâmpadas?</th>
+                    <td>{{ product.metafields.custom.acompanha_lampadas.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.potencia_total.value != blank %}
+                  <tr>
+                    <th>Potência total (W)</th>
+                    <td>{{ product.metafields.custom.potencia_total.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.fluxo_luminoso.value != blank %}
+                  <tr>
+                    <th>Fluxo luminoso</th>
+                    <td>{{ product.metafields.custom.fluxo_luminoso.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom._irc.value != blank %}
+                  <tr>
+                    <th>Índice de reprodução de cor (IRC)</th>
+                    <td>{{ product.metafields.custom._irc.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.light_temperature.value != blank %}
+                  <tr>
+                    <th>Temperatura da luz</th>
+                    <td>{{ product.metafields.shopify.light_temperature.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.temperatura_de_cor.value != blank %}
+                  <tr>
+                    <th>Cor da luz (K)</th>
+                    <td>{{ product.metafields.custom.temperatura_de_cor.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.dimerizavel.value != blank %}
+                  <tr>
+                    <th>Dimerizável</th>
+                    <td>{{ product.metafields.custom.dimerizavel.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.grau_de_protecao.value != blank %}
+                  <tr>
+                    <th>Grau de proteção (IP)</th>
+                    <td>{{ product.metafields.custom.grau_de_protecao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.vida_util_media.value != blank %}
+                  <tr>
+                    <th>Vida útil média</th>
+                    <td>{{ product.metafields.custom.vida_util_media.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                 {%- if product.metafields.custom.energy_consumption.value != blank %}
+                  <tr>
+                    <th>Eficiência energética</th>
+                    <td>{{ product.metafields.custom.energy_consumption.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.mounting_type.value != blank %}
+                  <tr>
+                    <th>Tipo de suporte</th>
+                    <td>{{ product.metafields.shopify.mounting_type.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.instalacao.value != blank %}
+                  <tr>
+                    <th>Instalação</th>
+                    <td>{{ product.metafields.custom.instalacao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tipo_de_interruptor.value != blank %}
+                  <tr>
+                    <th>Tipo de interruptor</th>
+                    <td>{{ product.metafields.custom.tipo_de_interruptor.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.cabo_de_alimentacao.value != blank %}
+                  <tr>
+                    <th>Cabo de alimentação</th>
+                    <td>{{ product.metafields.custom.cabo_de_alimentacao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.certificacoes.value != blank %}
+                  <tr>
+                    <th>Certificações</th>
+                    <td>{{ product.metafields.custom.certificacoes.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.contem_na_embalagem.value != blank %}
+                  <tr>
+                    <th>Contém na embalagem</th>
+                    <td>{{ product.metafields.custom.contem_na_embalagem.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                </table>
+              </div>
+            </details>
+          </div>
+
+
+  {% if block.settings.show_below_product_media %}
+    {% assign blocks_below_media = blocks_below_media | append: ficha_tecnica_html %}
+  {% else %}
+    {{ ficha_tecnica_html }}
+  {% endif %}
+
+        
+        {%- when 'popup' -%}
+          {%- liquid
+            assign modal_id = 'PopupModal-' | append: block.id
+          -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            <button
+              class="btn {{ block.settings.button_style }}"
+              aria-controls="{{ modal_id }}"
+              aria-haspopup="dialog"
+            >
+              <span class="btn__text">
+                {{- block.settings.button_label | default: block.settings.page.title | escape -}}
+              </span>
+            </button>
+            <basic-modal id="{{ modal_id }}" class="drawer modal product__popup-modal" style="--modal-width: 77rem;">
+              <div class="fixed-overlay" aria-controls="{{ modal_id }}"></div>
+              <div class="drawer__inner">
+                <button
+                  class="drawer__close-btn"
+                  aria-controls="{{ modal_id }}"
+                  aria-label="{{ 'accessibility.close' | t }}"
+                >
+                  {% render 'icon-close' %}
+                </button>
+                <div class="drawer__body v-scrollable h-full">
+                  <h1 class="h2 product__popup-page-title">{{ block.settings.page.title | escape }}</h1>
+                  {{ block.settings.page.content }}
+                </div>
+              </div>
+            </basic-modal>
+          </div>
+        {%- when 'addons' -%}
+          {%- if block.settings.show_share or block.settings.show_ask_question -%}
+            <div class="{{ block_classes }} flex items-center" {{ block.shopify_attributes }}>
+              {%- if block.settings.show_share -%}
+                <script src="{{ 'product-share.js' | asset_url }}" defer="defer"></script>
+                {%- liquid
+                  assign share_modal_id = 'PopupModal-Sharing-' | append: section.id
+                  assign share_url = product.selected_or_first_available_variant.url | default: product.url | prepend: request.origin
+                -%}
+                <button
+                  class="btn btn--plain"
+                  aria-controls="{{ share_modal_id }}"
+                  aria-haspopup="dialog"
+                >
+                  {% render 'icon-share-fat' %}
+                  <span class="font-body text-normal tracking-normal">
+                    {{- 'products.product.share_label' | t -}}
+                  </span>
+                </button>
+                <basic-modal id="{{ share_modal_id }}" class="drawer modal">
+                  <div class="fixed-overlay" aria-controls="{{ share_modal_id }}"></div>
+                  <div class="drawer__inner">
+                    <button
+                      class="drawer__close-btn"
+                      aria-controls="{{ share_modal_id }}"
+                      aria-label="{{ 'accessibility.close' | t }}"
+                    >
+                      {% render 'icon-close' %}
+                    </button>
+                    <div class="drawer__body v-scrollable h-full">
+                      <div class="product__sharing">
+                        <h3 class="product__sharing--title h5">{{ 'products.product.share' | t }}</h3>
+                        <product-share class="product__sharing--inputs" id="ProductShare-{{ section.id }}">
+                          <label for="ProductShare-{{ section.id }}" class="visually-hidden">
+                            {{- 'products.product.share_label' | t -}}
+                          </label>
+                          <input
+                            id="ProductShare-{{ section.id }}"
+                            type="text"
+                            class="form-control"
+                            value="{{ share_url }}"
+                            readonly
+                          >
+                          <button class="btn btn-copy" data-copied-text="{{ 'general.share.copied' | t }}">
+                            {{ 'general.share.copy' | t }}
+                          </button>
+                        </product-share>
+                        {% render 'social-sharing',
+                          url: product.url,
+                          share_image: product.featured_media.preview_image
+                        %}
+                      </div>
+                    </div>
+                  </div>
+                </basic-modal>
+              {%- endif -%}
+              {%- if block.settings.show_ask_question -%}
+                {%- assign ask_question_modal_id = 'PopupModal-AskQuestionForm-' | append: section.id -%}
+                <button
+                  class="btn btn--plain"
+                  aria-controls="{{ ask_question_modal_id }}"
+                  aria-haspopup="dialog"
+                >
+                  {% render 'icon-share-fat' %}
+                  <span class="font-body text-normal tracking-normal">
+                    {{- 'products.product.question_form.label' | t -}}
+                  </span>
+                </button>
+                <basic-modal id="{{ ask_question_modal_id }}" class="drawer modal">
+                  <div class="fixed-overlay" aria-controls="{{ ask_question_modal_id }}"></div>
+                  <div class="drawer__inner">
+                    <button
+                      class="drawer__close-btn"
+                      aria-controls="{{ ask_question_modal_id }}"
+                      aria-label="{{ 'accessibility.close' | t }}"
+                    >
+                      {% render 'icon-close' %}
+                    </button>
+                    <div class="drawer__body v-scrollable h-full">
+                      {% render 'ask-question-form' %}
+                    </div>
+                  </div>
+                </basic-modal>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        {%- when 'social_sharing' -%}
+          <div class="{{ block_classes }} flex items-center gap-4" {{ block.shopify_attributes }}>
+            <span class="btn btn--plain cursor-auto">{{ 'general.share.title' | t }}</span>
+            {% render 'product-social-sharing', url: product.url, share_image: product.featured_media.preview_image %}
+          </div>
+        {%- when 'variant_picker' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {% render 'product-variant-picker',
+              product: product,
+              block: block,
+              product_form_id: product_form_id,
+              update_url: update_browser_history
+            %}
+          </div>
+        {%- when 'buy_buttons' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {%- render 'buy-buttons',
+              block: block,
+              product: product,
+              product_form_id: product_form_id,
+              section_id: section.id,
+              product_id: product.id
+            -%}
+          </div>
+
+<!-- Indicador de Estoque e Unidades Vendidas -->
+<div class="product-stock-container">
+  <!-- Indicador "Em estoque" -->
+  <div class="product-stock-indicator">
+    <span class="stock-dot"></span>
+    <span class="stock-text">Em estoque</span>
+  </div>
+</div>
+
+<!-- CSS para o indicador de estoque -->
+<style>
+  /* Container para os indicadores */
+  .product-stock-container {
+    display: flex;
+    align-items: center;
+    margin-top: 16px;
+    padding-left: 4px;
+    flex-wrap: wrap;
+  }
+  
+  /* Indicador "Em estoque" */
+  .product-stock-indicator {
+    display: flex;
+    align-items: center;
+  }
+  
+  .stock-dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #0d8756;
+  }
+  
+  .stock-dot::before,
+  .stock-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 1.5px solid rgba(13, 135, 86, 0.6);
+    transform: translate(-50%, -50%);
+    animation: ripple 2s infinite ease-out;
+  }
+  
+  .stock-dot::after {
+    animation-delay: 0.6s;
+  }
+  
+  @keyframes ripple {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 1;
+    }
+    100% {
+      width: 18px;
+      height: 18px;
+      opacity: 0;
+    }
+  }
+  
+  .stock-text {
+    font-size: 1rem;
+    color: #999;
+    margin-left: 8px;
+  }
+</style>
+<!-- Calculador de Prazo -->
+{% render 'delivery-calculator' %}
+              
+        {%- when 'pickup_availability' -%}
+          <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+            {%- render 'product-pickup-availability', product: product -%}
+          </div>
+        {%- when 'badges' -%}
+          <div
+            class="{{ block_classes }} product__badges flex flex-wrap items-center"
+            id="Badges-{{ section.id }}"
+            {{ block.shopify_attributes }}
+          >
+            {%- render 'product-badges', block: block, product: product, section_id: section.id -%}
+          </div>
+        {%- when 'shipping' -%}
+          {%- if block.settings.deliver_days != blank -%}
+            <div class="{{ block_classes }}" {{ block.shopify_attributes }}>
+              <ul class="icon-with-text icon-with-text--vertical list-unstyled">
+                <li class="icon-with-text__item">
+                  {%- render 'icon-truck' -%}
+                  {%- liquid
+                    assign date_format = block.settings.date_format | default: '%b %d'
+                    assign range = 2 | times: 24 | times: 60 | times: 60
+                    assign deliver_in = block.settings.deliver_days | times: 24 | times: 60 | times: 60
+                    assign now = 'now' | date: '%s'
+                    assign from = now | plus: deliver_in | minus: range | date: date_format
+                    assign to = now | plus: deliver_in | plus: range | date: date_format
+                  -%}
+                  <div>
+                    {{- block.settings.deliver_text | strip_html }}
+                    <span>{{ from }} - {{ to }}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          {%- endif -%}
+
+              
+        {%- when 'complementary' -%}
+          <div
+            class="{{ block_classes }} product__block--{{ block.type }}-{% if block.settings.make_collapsible_row %}collapsible{% else %}inline{% endif %}{% if block.settings.block_heading != blank %} has-heading{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {%- render 'product-complementary', block: block, product_id: product.id, section_id: section.id -%}
+          </div>
+        
+        {%- when 'icon-with-text' -%}
+          <div
+            class="{{ block_classes }} product__block--{{ block.type }}-{{ block.settings.layout }}"
+            {{ block.shopify_attributes }}
+          >
+            {% render 'icon-with-text',
+              layout: block.settings.layout,
+              title_size: block.settings.title_size,
+              title_font: block.settings.title_font,
+              heading_1: block.settings.heading_1,
+              image_1: block.settings.image_1,
+              icon_1: block.settings.icon_1,
+              heading_2: block.settings.heading_2,
+              image_2: block.settings.image_2,
+              icon_2: block.settings.icon_2,
+              heading_3: block.settings.heading_3,
+              image_3: block.settings.image_3,
+              icon_3: block.settings.icon_3
+            %}
+          </div>
+
+        {%- when 'timer' -%}
+          {%- capture rgb -%}
+            {{ block.settings.text_color.red }},{{ block.settings.text_color.green }},{{ block.settings.text_color.blue }}
+          {%- endcapture -%}
+          <div
+            class="{{ block_classes }} countdown__wrapper blocks-radius flex flex-wrap items-center justify-between gap-2 md:gap-4"
+            style="color: {{ block.settings.text_color }};--color-foreground: {{ rgb }};"
+            {{ block.shopify_attributes }}
+          >
+            <div class="inline-flex items-center gap-2">
+              {%- render 'icon-clock' -%}
+              {%- if block.settings.text != blank -%}
+                <span class="font-body-bolder md:text-base text-sm-extra">{{ block.settings.text }}</span>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.type == 'evergreen' or block.settings.time != blank -%}
+              {%- render 'countdown-timer',
+                id: block.id,
+                type: block.settings.type,
+                duration: block.settings.duration,
+                time: block.settings.time,
+                number_size: 'h4',
+                custom_class: 'flex items-center justify-center',
+                block_class: 'font-body-bolder'
+              -%}
+            {%- endif -%}
+          </div>
+        {%- when 'newsletter' -%}
+          <div class="{{ block_classes }} flex flex-col gap-5" {{ block.shopify_attributes }}>
+            <h2 class="{{ block.settings.heading_size }}">{{ block.settings.heading }}</h2>
+            <div class="grid gap-4 text-center">
+              {% render 'newsletter-form',
+                custom_id: block.id,
+                hide_label: true,
+                button_style: block.settings.button_style
+              %}
+              {%- if block.settings.newsletter_term != blank -%}
+                <div class="rich-text__text rte {{ block.settings.newsletter_term_size }}">
+                  {{ block.settings.newsletter_term }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+              
+  {%- if show_details_link == true -%}
+    <div class="product__view-details text-center z-1">
+      <a
+        {% if product == blank %}
+          role="link" aria-disabled="true" disabled
+        {% else %}
+          href="{{ product.url }}"
+        {% endif %}
+        class="btn btn--underline"
+      >
+        <span class="btn__text">{{- 'products.product.view_full_details' | t -}}</span>
+        <span class="md:hidden btn btn--icon-circle btn--extra-small pointer-events-none">
+          {%- render 'icon-caret-right', size: 'extra-small' -%}
+        </span>
+      </a>
+    </div>
+  {%- endif -%}
+              
+</div>

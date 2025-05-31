@@ -1,0 +1,617 @@
+<div class="delivery-calculator-drawer" id="drawerDeliveryCalculator">
+  <h3 class="delivery-calculator-drawer__title">Calcular prazo</h3>
+  
+  <div class="delivery-calculator-drawer__form">
+    <!-- Grupo dos 5 dígitos -->
+    <div class="delivery-calculator-drawer__input-group delivery-calculator-drawer__cep-group">
+      {% for i in (0..4) %}
+        <div class="delivery-calculator-drawer__field">
+          <input
+            type="text"
+            class="delivery-calculator-drawer__input drawer-cep-digit"
+            data-index="{{ i }}"
+            maxlength="1"
+            pattern="[0-9]"
+            inputmode="numeric"
+          >
+        </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Separador -->
+    <span class="delivery-calculator-drawer__separator">-</span>
+    
+    <!-- Grupo dos 3 dígitos -->
+    <div class="delivery-calculator-drawer__input-group delivery-calculator-drawer__sufix-group">
+      {% for i in (0..2) %}
+        <div class="delivery-calculator-drawer__field">
+          <input
+            type="text"
+            class="delivery-calculator-drawer__input drawer-sufix-digit"
+            data-index="{{ i }}"
+            maxlength="1"
+            pattern="[0-9]"
+            inputmode="numeric"
+          >
+        </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Loading em vez de animação Lottie -->
+    <div class="delivery-calculator-drawer__loading" style="display:none;">
+      <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="drawer-search-icon">
+        <style>
+          .drawer-search-icon {
+            animation: rotate 1.5s linear infinite;
+          }
+          @keyframes rotate {
+            to { transform: rotate(360deg); }
+          }
+        </style>
+        <path d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,19a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" fill="#E0E0E0"/>
+        <path d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" fill="#000"/>
+      </svg>
+    </div>
+  </div>
+  
+  <p class="delivery-calculator-drawer__hint">Insira seu CEP</p>
+  
+  <!-- Local para exibir os resultados -->
+  <div class="delivery-calculator-drawer__results"></div>
+</div>
+
+<style>
+/* Estilos do calculador no drawer - completamente isolados */
+.delivery-calculator-drawer {
+  margin: 10px 0 10px;
+  border-top: 1px solid #E0E0E0;
+  padding-top: 10px;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+.delivery-calculator-drawer__title {
+  font-size: 14px !important;
+  font-weight: 600;
+  margin-bottom: 10px !important;
+  line-height: 1.3;
+  color: #000;
+  text-align: left;
+}
+
+.delivery-calculator-drawer__form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.delivery-calculator-drawer__input-group {
+  display: flex;
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.delivery-calculator-drawer__cep-group {
+  width: 180px;
+}
+
+.delivery-calculator-drawer__sufix-group {
+  width: 108px;
+}
+
+.delivery-calculator-drawer__field {
+  flex: 1;
+  position: relative;
+}
+
+.delivery-calculator-drawer__input {
+  width: 100%;
+  height: 38px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #999;
+  padding: 0;
+}
+
+.delivery-calculator-drawer__input:focus {
+  outline: none;
+}
+
+.delivery-calculator-drawer__field:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background-color: #E0E0E0;
+}
+
+.delivery-calculator-drawer__separator {
+  font-size: 18px;
+  font-weight: 300;
+  color: #999;
+  display: flex;
+  align-items: center;
+}
+
+  .totals__subtotal {
+    font-size: 14px;
+  }
+
+.delivery-calculator-drawer__hint {
+  font-size: 10px;
+  color: #999;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 5px;
+  margin-bottom: 10px;
+}
+
+.delivery-calculator-drawer__results {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #000;
+  font-weight: 400;
+}
+
+.delivery-calculator-drawer__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 38px;
+}
+
+/* Estilos do card de resultado */
+.drawer-shipping-card {
+  background-color: #F8F8F8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin-top: 0.75rem;
+  border-radius: 6px;
+  gap: 12px;
+  min-height: 80px;
+}
+
+.drawer-shipping-card__left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.drawer-shipping-card__icon {
+  flex-shrink: 0;
+}
+
+.drawer-shipping-card__icon svg {
+  width: 24px;
+  height: 24px;
+  color: #000;
+  margin-right: 8px;
+}
+
+.drawer-shipping-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-shipping-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0px;
+}
+
+.drawer-shipping-card__express {
+  color: #999;
+  font-size: 10px;
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+
+.drawer-shipping-card__city,
+.drawer-shipping-card__date {
+  color: #999;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.drawer-shipping-card__badge {
+  background-color: #EEF6EE;
+  color: #0d8756;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  height: fit-content;
+}
+
+.delivery-calculator-drawer__error {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+}
+  
+  /* Estilos para o botão de fechar */
+.drawer-shipping-card {
+  position: relative; /* Necessário para posicionamento absoluto do botão */
+  padding-right: 36px; /* Espaço para o botão */
+}
+
+.drawer-shipping-card__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+  color: #999;
+  text-decoration: none;
+  background-color: transparent;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 5;
+}
+
+.drawer-shipping-card__close:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 480px) {
+  .drawer-shipping-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+  }
+  
+  .drawer-shipping-card__badge {
+    align-self: flex-start;
+  }
+}
+</style>
+
+<script>
+// Script isolado para o calculador no drawer
+document.addEventListener('DOMContentLoaded', function() {
+  initDrawerDeliveryCalculator();
+  
+  // Observador para detectar mudanças no drawer
+  const bodyObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'class') {
+        const body = document.body;
+        if (body.classList.contains('js-drawer-open-right') || 
+            body.classList.contains('cart-drawer-open') ||
+            document.querySelector('.cart-drawer:not([hidden])')) {
+          console.log('Cart drawer detectado - reinicializando calculador');
+          setTimeout(initDrawerDeliveryCalculator, 500);
+        }
+      }
+    });
+  });
+  
+  // Observar mudanças no body
+  bodyObserver.observe(document.body, { attributes: true });
+  
+  // Detectar eventos específicos do drawer ou carrinho
+  document.addEventListener('cart:ready', function() {
+    setTimeout(initDrawerDeliveryCalculator, 500);
+  });
+  
+  document.addEventListener('cart:updated', function() {
+    setTimeout(initDrawerDeliveryCalculator, 500);
+  });
+  
+  // Observar mudanças no conteúdo do DOM para detectar quando o drawer é inserido
+  const contentObserver = new MutationObserver(function(mutations) {
+    if (document.getElementById('drawerDeliveryCalculator')) {
+      setTimeout(initDrawerDeliveryCalculator, 300);
+    }
+  });
+  
+  contentObserver.observe(document.body, { 
+    childList: true, 
+    subtree: true 
+  });
+});
+
+// Tabela de prazos fixos
+const DRAWER_PRAZOS = {
+  capitais: {
+    "ARACAJU": [5, 9],
+    "BELEM": [5, 10],
+    "BELO HORIZONTE": [4, 9],
+    "BOA VISTA": [5, 10],
+    "BRASILIA": [5, 10],
+    "CAMPO GRANDE": [5, 10],
+    "CUIABA": [5, 10],
+    "CURITIBA": [5, 10],
+    "FLORIANOPOLIS": [5, 9],
+    "FORTALEZA": [5, 9],
+    "GOIANIA": [5, 10],
+    "ITAJAI": [5, 9],
+    "JOAO PESSOA": [5, 9],
+    "MACAPA": [5, 10],
+    "MACEIO": [5, 9],
+    "MANAUS": [5, 10],
+    "NATAL": [5, 9],
+    "PALMAS": [5, 10],
+    "PARANAGUA": [4, 9],
+    "PORTO ALEGRE": [5, 10],
+    "PORTO VELHO": [5, 10],
+    "RECIFE": [5, 9],
+    "RIO BRANCO": [5, 10],
+    "RIO DE JANEIRO": [5, 9],
+    "RIO GRANDE": [5, 9],
+    "SALVADOR": [5, 9],
+    "SANTOS": [4, 9],
+    "SAO LUIS": [5, 9],
+    "SAO PAULO": [4, 8],
+    "SUAPE": [5, 9],
+    "TERESINA": [5, 9],
+    "VITORIA": [5, 10]
+  },
+  rest_SP: [4, 9],
+  others: [7, 11]
+};
+
+// Inicializa o calculador de prazo no drawer
+function initDrawerDeliveryCalculator() {
+  const calculatorElement = document.getElementById('drawerDeliveryCalculator');
+  if (!calculatorElement) {
+    return; // Elemento não encontrado, sair
+  }
+  
+  // Remover event listeners anteriores para evitar duplicação
+  const oldCepInputs = calculatorElement.querySelectorAll('.drawer-cep-digit');
+  const oldSufixInputs = calculatorElement.querySelectorAll('.drawer-sufix-digit');
+  
+  oldCepInputs.forEach(input => {
+    input.removeEventListener('input', handleCepInput);
+    input.removeEventListener('keydown', handleCepKeydown);
+  });
+  
+  oldSufixInputs.forEach(input => {
+    input.removeEventListener('input', handleSufixInput);
+    input.removeEventListener('keydown', handleSufixKeydown);
+  });
+  
+  // Capturar elementos
+  const cepInputs = calculatorElement.querySelectorAll('.drawer-cep-digit');
+  const sufixInputs = calculatorElement.querySelectorAll('.drawer-sufix-digit');
+  const loadingElement = calculatorElement.querySelector('.delivery-calculator-drawer__loading');
+  const resultsElement = calculatorElement.querySelector('.delivery-calculator-drawer__results');
+  
+  if (cepInputs.length === 0 || sufixInputs.length === 0) {
+    console.error('Elementos do calculador não encontrados');
+    return;
+  }
+  
+  // Adicionar event listeners para os inputs do CEP
+  cepInputs.forEach((input, idx) => {
+    input.addEventListener('input', handleCepInput);
+    input.addEventListener('keydown', handleCepKeydown);
+  });
+  
+  // Adicionar event listeners para os inputs do sufixo
+  sufixInputs.forEach((input, idx) => {
+    input.addEventListener('input', handleSufixInput);
+    input.addEventListener('keydown', handleSufixKeydown);
+  });
+  
+  // Handler para input de CEP
+  function handleCepInput(e) {
+    const input = e.target;
+    const idx = parseInt(input.getAttribute('data-index'), 10);
+    
+    // Limitar a apenas números
+    input.value = input.value.replace(/\D/g, '');
+    
+    // Avançar para o próximo campo
+    if (input.value && idx < 4) {
+      cepInputs[idx + 1].focus();
+    } else if (input.value && idx === 4) {
+      sufixInputs[0].focus();
+    }
+  }
+  
+  // Handler para keydown de CEP (backspace)
+  function handleCepKeydown(e) {
+    const input = e.target;
+    const idx = parseInt(input.getAttribute('data-index'), 10);
+    
+    if (e.key === 'Backspace' && !input.value && idx > 0) {
+      cepInputs[idx - 1].focus();
+    }
+  }
+  
+  // Handler para input de sufixo
+  function handleSufixInput(e) {
+    const input = e.target;
+    const idx = parseInt(input.getAttribute('data-index'), 10);
+    
+    // Limitar a apenas números
+    input.value = input.value.replace(/\D/g, '');
+    
+    // Avançar para o próximo campo
+    if (input.value && idx < 2) {
+      sufixInputs[idx + 1].focus();
+    }
+    
+    // Verificar se todos os campos estão preenchidos
+    if (idx === 2 && input.value) {
+      const fullCep = getFullCep();
+      if (fullCep.length === 8) {
+        startLoading();
+      }
+    }
+  }
+  
+  // Handler para keydown de sufixo (backspace)
+  function handleSufixKeydown(e) {
+    const input = e.target;
+    const idx = parseInt(input.getAttribute('data-index'), 10);
+    
+    if (e.key === 'Backspace' && !input.value && idx > 0) {
+      sufixInputs[idx - 1].focus();
+    } else if (e.key === 'Backspace' && !input.value && idx === 0) {
+      cepInputs[4].focus();
+    }
+  }
+  
+  // Obter o CEP completo
+  function getFullCep() {
+    let cepPart = '';
+    let sufixPart = '';
+    
+    cepInputs.forEach(input => {
+      cepPart += input.value || '';
+    });
+    
+    sufixInputs.forEach(input => {
+      sufixPart += input.value || '';
+    });
+    
+    return cepPart + sufixPart;
+  }
+  
+  // Iniciar o loading e calcular o prazo
+  function startLoading() {
+    resultsElement.innerHTML = '';
+    loadingElement.style.display = 'flex';
+    
+    setTimeout(function() {
+      loadingElement.style.display = 'none';
+      calculateDeliveryDate();
+    }, 1000);
+  }
+  
+  // Calcular o prazo de entrega
+  async function calculateDeliveryDate() {
+    const fullCep = getFullCep();
+    if (fullCep.length < 8) return;
+    
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${fullCep}/json/`);
+      if (!response.ok) throw new Error('Erro ao consultar CEP');
+      
+      const data = await response.json();
+      if (data.erro) throw new Error('CEP não encontrado');
+      
+      const city = (data.localidade || '').toUpperCase();
+      const uf = (data.uf || '').toUpperCase();
+      
+      // Determinar prazo com base na cidade/estado
+      let [minDays, maxDays] = DRAWER_PRAZOS.others; // Padrão
+      
+      if (uf === 'SP') {
+        if (DRAWER_PRAZOS.capitais[city]) {
+          [minDays, maxDays] = DRAWER_PRAZOS.capitais[city];
+        } else {
+          [minDays, maxDays] = DRAWER_PRAZOS.rest_SP;
+        }
+      } else if (DRAWER_PRAZOS.capitais[city]) {
+        [minDays, maxDays] = DRAWER_PRAZOS.capitais[city];
+      }
+      
+      // Calcular datas de entrega
+      const minDate = addBusinessDays(new Date(), minDays);
+      const maxDate = addBusinessDays(new Date(), maxDays);
+      
+      // Formatar datas
+      const minDateFormatted = formatDate(minDate);
+      const maxDateFormatted = formatDate(maxDate);
+      
+      // Exibir resultado
+      showResult(data.localidade, data.uf, minDateFormatted, maxDateFormatted);
+      
+    } catch (error) {
+      console.error('Erro:', error);
+      resultsElement.innerHTML = '<p class="delivery-calculator-drawer__error">CEP não encontrado. Verifique e tente novamente.</p>';
+    }
+  }
+  
+  // Adicionar dias úteis a uma data
+  function addBusinessDays(date, days) {
+    const result = new Date(date);
+    let addedDays = 0;
+    
+    while (addedDays < days) {
+      result.setDate(result.getDate() + 1);
+      const dayOfWeek = result.getDay();
+      
+      // Pular finais de semana (0 = Domingo, 6 = Sábado)
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        addedDays++;
+      }
+    }
+    
+    return result;
+  }
+  
+  // Formatar data para exibição
+  function formatDate(date) {
+    const day = date.getDate();
+    
+    // Nomes dos meses em português
+    const months = [
+      'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    ];
+    
+    const month = months[date.getMonth()];
+    
+    return `${day} de ${month}`;
+  }
+  
+  // Exibir o resultado
+  function showResult(city, state, minDate, maxDate) {
+    resultsElement.innerHTML = `
+      <div class="drawer-shipping-card">
+      <!-- Link simples que limpa resultados -->
+      <a href="#" 
+         class="drawer-shipping-card__close" 
+         aria-label="Fechar"
+         onclick="this.parentNode.parentNode.innerHTML = ''; return false;">×</a>
+        <div class="drawer-shipping-card__left">
+          <div class="drawer-shipping-card__icon">
+            <svg id="Layer_1" enable-background="new 0 0 30 30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="m21.367 24.493h-2.656c-.414 0-.75.336-.75.75s.336.75.75.75h2.656c.414 0 .75-.336.75-.75s-.336-.75-.75-.75z"/>
+              <path d="m29.014 10.952-12.469-8.447c-.93-.633-2.154-.633-3.084 0l-2.375 1.609v-.281c0-1.703-1.38-3.083-3.083-3.083s-3.083 1.38-3.083 3.083v4.458l-3.929 2.662c-.462.313-.738.834-.738 1.392v3.464c0 .93.755 1.684 1.685 1.683.322 0 .638-.093.909-.267l1.073-.692v9.058c.002 2.02 1.639 3.657 3.659 3.659h19.668c1.379-.003 2.497-1.121 2.5-2.5v-3.967-.014-3.223-.015-1.131-.014-6.04c.001-.557-.273-1.079-.733-1.394zm-22.594-7.119c0-.874.709-1.583 1.583-1.583s1.583.709 1.583 1.583v1.3l-3.166 2.142zm8.671 23.914h-7.512c-1.191-.001-2.156-.965-2.159-2.156h.002v-10.024l9.581-6.175 7.784 5.015h-5.366c-1.379.003-2.497 1.121-2.5 2.5v9.972c.001.298.059.592.17.868zm8.855-11.84v2.416l-1-.561c-.383-.215-.85-.215-1.233 0l-1 .561.009-2.416zm3.306 11.839h-9.961c-.48.001-.871-.388-.873-.868v-9.968c0-.552.448-1 1-1h1.8v2.838c0 .693.562 1.254 1.254 1.254.216 0 .428-.056.616-.162l1.242-.7 1.242.7c.388.222.865.218 1.249-.01.386-.223.623-.636.621-1.082v-2.841h1.8c.552 0 1 .448 1 1v9.836l.01.003c0 .552-.448 1-1 1zm1-13.124c-.317-.141-.659-.214-1.006-.215h-1.688l-9.885-6.368c-.408-.262-.932-.262-1.34 0l-12.298 7.924c-.055.038-.128.041-.186.007-.062-.03-.101-.092-.1-.161v-3.464c0-.06.03-.117.08-.151l4.2-2.848c.017-.01.037-.014.054-.026l4.666-3.164c.008 0 .011-.015.019-.021l3.535-2.388c.423-.286.977-.286 1.4 0l12.468 8.447c.051.034.081.091.081.152z"/>
+            </svg>
+          </div>
+          
+          <div class="drawer-shipping-card__info">
+            <div class="drawer-shipping-card__title">Receba em casa</div>
+            
+            <div class="drawer-shipping-card__express">
+              Frete expresso <span class="drawer-shipping-card__city">(${city})</span>
+            </div>
+            
+            <div class="drawer-shipping-card__date">
+              Entrega entre ${minDate} a ${maxDate}.
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-shipping-card__badge">Grátis</div>
+      </div>
+    `;
+
+  }
+}
+</script>

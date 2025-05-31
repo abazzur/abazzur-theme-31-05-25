@@ -1,0 +1,69 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_F4iNAA": {
+      "type": "breadcrumbs",
+      "settings": {
+        "text_alignment": "start"
+      }
+    },
+    "main": {
+      "type": "main-blog",
+      "blocks": {
+        "featured_post_fgVGy7": {
+          "type": "featured_post",
+          "settings": {
+            "featured_image_ratio": "4/3",
+            "heading_size": "h2",
+            "show_section_divider": true
+          }
+        },
+        "heading_U7FQUU": {
+          "type": "heading",
+          "settings": {
+            "heading_size": "h1",
+            "content_alignment": "center"
+          }
+        },
+        "tags_cTH8Uh": {
+          "type": "tags",
+          "settings": {
+            "limit": 6,
+            "alignment": "center"
+          }
+        }
+      },
+      "block_order": [
+  "heading_U7FQUU",
+  "tags_cTH8Uh",
+  "featured_post_fgVGy7"
+      ],
+      "settings": {
+        "post_limit": 9,
+        "columns_desktop": 3,
+        "column_gap": "large",
+        "row_gap": "extra-large",
+        "card_title_size": "h3",
+        "show_tags": true,
+        "show_excerpt": true,
+        "show_date": true,
+        "show_author": true,
+        "show_button": false,
+        "padding_top": 40,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_F4iNAA",
+    "main"
+  ]
+}

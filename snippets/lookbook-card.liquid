@@ -1,0 +1,156 @@
+{% comment %}
+  Usage:
+  {{ 'component-lookbook-card.css' | asset_url | stylesheet_tag }}
+  {{ 'component-lookbook-card-modal.css' | asset_url | stylesheet_tag }}
+
+  {% render 'lookbook-card',
+    block_id: block.id,
+    color_scheme: color_scheme,
+    product_list: product_list,
+    image: image,
+    image_ratio: image_ratio,
+    heading: heading,
+    heading_size: heading_size
+  %}
+{% endcomment %}
+
+{%- liquid
+  assign modal_id = 'lbcard__popup-' | append: block_id
+  assign image_ratio = image_ratio | default: '3/4'
+  assign alt = image.alt | default: shop.name | escape
+  assign loading = 'lazy'
+  assign fetchpriority = 'low'
+
+  assign heading_size = heading_size | default: 'h5'
+
+  assign color_scheme = color_scheme | default: 'scheme-1'
+  assign popup_color_scheme = popup_color_scheme | default: 'scheme-1'
+
+  assign product_count = 2
+  if product_list != blank
+    assign product_count = product_list.count
+  endif
+-%}
+<div class="lbcard relative h-full">
+  <div
+    class="lbcard__media h-full{% unless image != blank %} bg-none{% endunless %} blocks-radius"
+    style="--aspect-ratio:{{ image_ratio }};"
+  >
+    <motion-element
+      data-motion="zoom-out"
+      data-motion-delay="50"
+      class="block media-wrapper"
+    >
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 1500
+          | image_tag:
+            loading: loading,
+            fetchpriority: fetchpriority,
+            class: 'motion-reduce w-full h-full',
+            widths: '375, 550, 750, 1100, 1500',
+            is: 'image-lazy',
+            alt: alt
+        }}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg w-full h-full' }}
+      {%- endif -%}
+    </motion-element>
+  </div>
+  <button
+    class="lbcard__popup-btn-trigger z-1 btn btn--white"
+    aria-label="{{ 'products.product.view_product_list' | t }}"
+    aria-controls="{{ modal_id }}"
+    aria-haspopup="true"
+    aria-expanded="false"
+  >
+    <span class="btn__text flex items-center gap-x-2">
+      {%- render 'icon-tag', name: settings.cart_icon -%}
+      {{- product_count -}}
+    </span>
+  </button>
+  <lookbook-card id="{{ modal_id }}" class="lbcard__popup drawer modal">
+    <div class="fixed-overlay" aria-controls="{{ modal_id }}"></div>
+    <div class="drawer__inner flex flex-col color-{{ popup_color_scheme }}">
+      <div class="lbcard__popup-header shrink-0">
+        <h3 class="lbcard__popup-heading {{ heading_size }}">{{ heading }}</h3>
+        <button
+          class="lbcard__popup-btn-close btn--inherit drawer__close-btn"
+          aria-controls="{{ modal_id }}"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {%- render 'icon-close' -%}
+        </button>
+      </div>
+      <div class="lbcard__popup-body v-scrollable flex flex-col">
+        {%- if product_list != blank -%}
+          {%- for prod in product_list -%}
+            <div class="lbcard__product flex items-center gap-3">
+              <a
+                class="lbcard__product-thumbnail shrink-0"
+                href="{{ prod.url }}"
+                aria-label="{{ prod.title | escape }}"
+                tabindex="-1"
+              >
+                <div
+                  class="media-wrapper blocks-radius-md"
+                  style="--aspect-ratio: 1;"
+                >
+                  {%- if prod.featured_media != blank -%}
+                    {%- liquid
+                      assign alt = prod.featured_media.alt | default: prod.title | escape
+                    -%}
+                    {{
+                      prod
+                      | image_url: width: 150
+                      | image_tag:
+                        loading: 'lazy',
+                        fetchpriority: 'low',
+                        class: 'motion-reduce',
+                        widths: '60, 75, 120, 150',
+                        is: 'image-lazy',
+                        alt: alt
+                    }}
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </div>
+              </a>
+              <div class="lbcard__product-info flex-1">
+                <h3 class="lbcard__product-title text-pcard-title text-limit-2-lines m-0">
+                  <a href="{{ prod.url }}" class="reversed-link focus-inset">
+                    {{- prod.title -}}
+                  </a>
+                </h3>
+                <div class="lbcard__product-price">{% render 'price', product: prod %}</div>
+              </div>
+              <a href="{{ prod.url }}" class="btn btn--icon-circle btn--icon" aria-label="{{ prod.title | escape }}">
+                <span class="btn__text flex">{% render 'icon-caret-right', size: 'extra-small icon--thick' %}</span>
+              </a>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for i in (1..2) -%}
+            <div class="lbcard__product flex items-center gap-3">
+              <div class="lbcard__product-thumbnail shrink-0">
+                <div
+                  class="media-wrapper blocks-radius-md"
+                  style="--aspect-ratio: 1;"
+                >
+                  {{ 'product-' | append: i | placeholder_svg_tag: 'placeholder-svg' }}
+                </div>
+              </div>
+              <div class="lbcard__product-info flex-1">
+                <h3 class="lbcard__product-title text-pcard-title text-limit-2-lines m-0">
+                  {{- 'onboarding.product_title' | t -}}
+                </h3>
+                <div class="lbcard__product-price">{% render 'price' %}</div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </lookbook-card>
+</div>

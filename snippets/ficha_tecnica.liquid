@@ -1,0 +1,283 @@
+ <div class="ficha_tecnica">
+    <details
+      class="accordion-details"
+      is="accordion-group"
+      {% if block.settings.default_open %}open aria-expanded="true"{% else %}aria-expanded="false"{% endif %}
+    >
+      <summary class="accordion-details__summary flex items-center justify-between focus-inset">
+        <div class="flex items-center gap-2">
+          {% if block.settings.icon != 'none' %}
+            {% render 'icons', icon: block.settings.icon, size: 'extra-large' %}
+          {% endif %}
+          <h2 class="{{ block.settings.heading_size }} inline-richtext">
+            {{ block.settings.heading }}
+          </h2>
+        </div>
+        {% render 'icon-plus-toggle' %}
+      </summary>
+
+      <div class="accordion-details__content rte">
+        {{ block.settings.content }}
+        {{ block.settings.page.content }}
+        
+        <table style="width:100%;border-collapse:collapse;">
+          <tbody>
+
+            
+{% assign color_metaobjects = product.metafields.shopify["color-pattern"].value %}
+{% assign color_list = "" %}
+
+{% for color_metaobject in color_metaobjects %}
+  {% assign this_color = color_metaobject.label %}
+  
+  {% if color_list == "" %}
+    {% assign color_list = this_color %}
+  {% else %}
+    {% assign color_list = color_list | append: ", " | append: this_color %}
+  {% endif %}
+{% endfor %}
+
+<tr>
+  <th>Cor</th>
+  <td>{{ color_list | default: "N/A" }}</td>
+</tr>
+
+
+
+
+
+            
+
+                  {%- if product.metafields.custom.material.value != blank %}
+                  <tr>
+                    <th>Material</th>
+                    <td>
+                      {{ product.metafields.custom.material.value | remove: '[' | remove: ']' | remove: '"' }}
+                    </td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.acabamento.value != blank %}
+                  <tr>
+                    <th>Acabamento</th>
+                    <td>
+                      {{ product.metafields.custom.acabamento.value | remove: '[' | remove: ']' | remove: '"' }}
+                    </td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.estilo.value != blank %}
+                  <tr>
+                    <th>Estilo</th>
+                    <td>{{ product.metafields.custom.estilo.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.altura1.value != blank %}
+                  <tr>
+                    <th>Altura</th>
+                    <td>{{ product.metafields.custom.altura1.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.largura1.value != blank %}
+                  <tr>
+                    <th>Largura</th>
+                    <td>{{ product.metafields.custom.largura1.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.comprimento1.value != blank %}
+                  <tr>
+                    <th>Comprimento</th>
+                    <td>{{ product.metafields.custom.comprimento1.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.diametro1.value != blank %}
+                  <tr>
+                    <th>Diâmetro Ø</th>
+                    <td>{{ product.metafields.custom.diametro1.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.espaco_adequado.value != blank %}
+                  <tr>
+                    <th>Espaço adequado</th>
+                    <td>{{ product.metafields.shopify.espaco_adequado.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.uso_recomendado.value != blank %}
+                  <tr>
+                    <th>Uso recomendado</th>
+                    <td>{{ product.metafields.custom.uso_recomendado.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tensao.value != blank %}
+                  <tr>
+                    <th>Tensão</th>
+                    <td>{{ product.metafields.custom.tensao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.soquete.value != blank %}
+                  <tr>
+                    <th>Soquete</th>
+                    <td>{{ product.metafields.custom.soquete.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.bulb_type.value != blank %}
+                  <tr>
+                    <th>Tipo de lâmpada</th>
+                    <td>{{ product.metafields.shopify.bulb_type.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tipo_de_lampada.value != blank %}
+                  <tr>
+                    <th>Modelo da lâmpada</th>
+                    <td>{{ product.metafields.custom.tipo_de_lampada.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.bulb_size.value != blank %}
+                  <tr>
+                    <th>Tamanho da lâmpada</th>
+                    <td>{{ product.metafields.shopify.bulb_size.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.quantidade_de_lampadas.value != blank %}
+                  <tr>
+                    <th>Quantidade de lâmpadas</th>
+                    <td>{{ product.metafields.custom.quantidade_de_lampadas.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.acompanha_lampadas.value != blank %}
+                  <tr>
+                    <th>Acompanha lâmpadas?</th>
+                    <td>{{ product.metafields.custom.acompanha_lampadas.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.potencia_total.value != blank %}
+                  <tr>
+                    <th>Potência total (W)</th>
+                    <td>{{ product.metafields.custom.potencia_total.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.fluxo_luminoso.value != blank %}
+                  <tr>
+                    <th>Fluxo luminoso</th>
+                    <td>{{ product.metafields.custom.fluxo_luminoso.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom._irc.value != blank %}
+                  <tr>
+                    <th>Índice de reprodução de cor (IRC)</th>
+                    <td>{{ product.metafields.custom._irc.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.light_temperature.value != blank %}
+                  <tr>
+                    <th>Temperatura da luz</th>
+                    <td>{{ product.metafields.shopify.light_temperature.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.temperatura_de_cor.value != blank %}
+                  <tr>
+                    <th>Cor da luz (K)</th>
+                    <td>{{ product.metafields.custom.temperatura_de_cor.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.dimerizavel.value != blank %}
+                  <tr>
+                    <th>Dimerizável</th>
+                    <td>{{ product.metafields.custom.suporta_dimerizacao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.grau_de_protecao.value != blank %}
+                  <tr>
+                    <th>Grau de proteção (IP)</th>
+                    <td>{{ product.metafields.custom.grau_de_protecao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                              {%- if product.metafields.custom.frequencia.value != blank %}
+                  <tr>
+                    <th>Frequência</th>
+                    <td>{{ product.metafields.custom.frequencia.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.vida_util_media.value != blank %}
+                  <tr>
+                    <th>Vida útil média</th>
+                    <td>{{ product.metafields.custom.vida_util_media.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.shopify.mounting_type.value != blank %}
+                  <tr>
+                    <th>Tipo de suporte</th>
+                    <td>{{ product.metafields.shopify.mounting_type.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.instalacao.value != blank %}
+                  <tr>
+                    <th>Instalação</th>
+                    <td>{{ product.metafields.custom.instalacao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.tipo_de_interruptor.value != blank %}
+                  <tr>
+                    <th>Tipo de interruptor</th>
+                    <td>{{ product.metafields.custom.tipo_de_interruptor.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.cabo_de_alimentacao.value != blank %}
+                  <tr>
+                    <th>Cabo de alimentação</th>
+                    <td>{{ product.metafields.custom.cabo_de_alimentacao.value }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.certificacoes.value != blank %}
+                  <tr>
+                    <th>Certificações</th>
+                    <td>{{ product.metafields.custom.certificacoes.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+                  </tr>
+                  {%- endif -%}
+
+                  {%- if product.metafields.custom.contem_na_embalagem.value != blank %}
+                  <tr>
+                    <th>Contém na embalagem</th>
+                    <td>{{ product.metafields.custom.contem_na_embalagem.value | remove: '[' | remove: ']' | remove: '"' }}</td>
+
+              </tr>
+            {% endif %}
+            <!-- Repita para outros Metafields -->
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+
+  {% if block.settings.show_below_product_media %}
+    {% assign blocks_below_media = blocks_below_media | append: ficha_tecnica_html %}
+  {% else %}
+    {{ ficha_tecnica_html }}
+  {% endif %}

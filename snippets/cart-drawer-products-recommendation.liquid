@@ -1,0 +1,72 @@
+{%- liquid
+  if recommendations.performed
+    if products_recommendations != blank
+      assign products_count = products_recommendations.count
+    elsif recommendations.products_count > 0
+      assign products_recommendations = recommendations.products
+      assign products_count = recommendations.products_count
+    endif
+  endif
+  assign is_carousel = false
+  if products_count > 3
+    assign is_carousel = true
+  endif
+-%}
+<cart-drawer-products-recommendation
+  class="cart-drawer-products-recommendation flex flex-col gap-3"
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section_id }}&product_id={{ product_id }}&limit={{ limit }}&intent=complementary"
+>
+  <div class="cart-drawer-products-recommendation__header flex items-center justify-between">
+    <p class="cart-drawer-products-recommendation__header">{{ heading | escape }}</p>
+  </div>
+{%- if recommendations.performed -%}
+  <div class="relative swiper-show-nav-on-hover">
+    <div
+      id="cart-drawer-products-recommendation-{{ section.id }}"
+      class="cart-drawer-products-recommendation__container swipe-mobile swipe-mobile--2-cols{% if is_carousel %} swiper{% endif %}"
+    >
+      <div class="{% if is_carousel %}swiper-wrapper{% else %}f-grid{% endif %} swipe-mobile__inner cart-drawer-products-recommendation__wrapper f-grid--gap-extra-small">
+        {%- for recommendation in products_recommendations -%}
+          <div class="swiper-slide">
+{%- render 'card-product-list',
+  product: recommendation,
+  show_vendor: false,
+  show_type: false,
+  title_class: "cart-item__title",
+  price_class: "text-subtext",
+  hide_buttons: true,
+  image_sizes: '(max-width: 767px) 42vw, calc(42rem / 3)'
+-%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+      {%- if is_carousel -%}
+        <div class="swiper-controls swiper-controls--nav-floating hidden md:flex">
+          <button
+            class="swiper-button-prev swiper-button btn swiper-button--drop-shadow"
+            name="previous"
+            aria-label="{{ 'general.slider.previous_slide' | t }}"
+          >
+            <span class="btn__text">{%- render 'icon-slider-prev', size: 'small' -%}</span>
+          </button>
+          <button
+            class="swiper-button-next swiper-button btn swiper-button--drop-shadow"
+            name="next"
+            aria-label="{{ 'general.slider.next_slide' | t }}"
+          >
+            <span class="btn__text">{%- render 'icon-slider-next', size: 'small' -%}</span>
+          </button>
+        </div>
+      {%- endif -%}
+      <scroll-progress-bar
+        class="md:hidden no-js-hidden"
+        target="cart-drawer-products-recommendation-{{ section.id }}"
+      >
+        <div class="progress-container">
+          <div class="progress-bar no-empty"></div>
+        </div>
+      </scroll-progress-bar>
+    </div>
+  {%- endif -%}
+</cart-drawer-products-recommendation>

@@ -1,0 +1,43 @@
+.promotion-banner {
+  --padding-x: 2.4rem;
+  --padding-y: 2.4rem;
+  padding: var(--padding-y) var(--padding-x);
+}
+.promotion-banner.color-scheme-inherit {
+  --padding-x: 0;
+}
+@media (min-width: 768px) {
+  .promotion-banner {
+    --padding-x: 2rem;
+    --padding-y: 3.2rem;
+  }
+}
+@media (min-width: 1024px) {
+  .promotion-banner {
+    --padding-x: 5rem;
+    --padding-y: 4.6rem;
+  }
+}
+@media (min-width: 1024px) {
+  .promotion-banner__inner {
+    gap: 2.4rem;
+    --text-margin-top: 0;
+    --child-margin-top: 0;
+    --subheading-margin-bottom: 0;
+  }
+}
+.promotion-banner__inner .countdown-timer__inner {
+  --margin-left-right: 1.2rem;
+}
+@media (min-width: 1024px) {
+  .promotion-banner__inner .countdown-timer__inner {
+    --margin-left-right: 2rem;
+  }
+}
+.promotion-banner__inner .countdown-timer__inner .countdown-timer__block {
+  margin: 0 var(--margin-left-right);
+}
+.promotion-banner__inner .countdown-timer__inner .countdown-timer__block div:after {
+  inset-inline-end: 0;
+  transform: translate(calc(50% + var(--margin-left-right)), -50%);
+}

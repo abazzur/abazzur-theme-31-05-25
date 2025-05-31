@@ -1,0 +1,575 @@
+{%- liquid
+  assign should_show = section.settings.enable
+  if section.settings.show_for_visitors_only and customer
+    assign should_show = false
+  endif
+
+  if section.settings.show_for_homepage_only and template != 'index'
+    assign should_show = false
+  endif
+
+  if request.design_mode
+    assign should_show = true
+  endif
+-%}
+{%- if should_show -%}
+  {%- style -%}
+    /* Overlay transparente */
+    .fixed-overlay {
+      background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    .subscription-popup__teaser {
+      writing-mode: sideways-lr;
+      position: fixed;
+      top: 50%;
+      transform: translate(-100%, -50%);
+      border-radius: var(--medium-blocks-radius);
+      border-start-start-radius: 0;
+      border-start-end-radius: 0;
+      width: 4rem;
+      height: auto;
+      padding: 1.2rem 0;
+      z-index: 29 !important;
+    }
+    
+    /* Estilos para o popup com design minimalista da ABAZZUR */
+    .subscription-popup__modern {
+      --modal-gap: 0;
+      --content-gap: 0;
+      --blocks-gap: 1.8rem;
+      overflow: hidden;
+    }
+    
+    .subscription-popup__modern .drawer__inner {
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+      border-radius: 10px;
+      background-color: #F5F5F5;
+      position: relative;
+      width: 360px !important;
+      height: 460px !important;
+      max-width: 360px !important;
+      margin: auto;
+    }
+    
+    .subscription-popup__modern .drawer__body {
+      padding: 0;
+      overflow: visible;
+      height: 100%;
+    }
+    
+    .subscription-popup__modern .flex {
+      flex-wrap: nowrap;
+      height: 100%;
+      position: relative;
+      flex-direction: column;
+    }
+    
+    /* Estilo para a imagem sobreposta */
+    .subscription-popup__modern .product-image-container {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      width: 280px;
+      height: auto;
+    }
+    
+    .subscription-popup__modern .product-image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    /* Conteúdo do formulário */
+    .subscription-popup__modern .subscription-popup__blocks {
+      margin-top: 140px;
+      width: 100%;
+      padding: 0 25px 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex-grow: 1;
+      text-align: center;
+    }
+    
+    .subscription-popup__modern .subscription-popup__title {
+      margin-bottom: 20px;
+    }
+    
+    .subscription-popup__modern .subscription-popup__title h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      line-height: 1.2;
+      margin-bottom: 0;
+    }
+    
+    .subscription-popup__modern .subscription-popup__title h3 .title-main {
+      font-weight: 600;
+      display: block;
+    }
+    
+    .subscription-popup__modern .subscription-popup__title h3 .title-sub {
+      font-weight: 500;
+      display: block;
+    }
+    
+    .subscription-popup__modern .subscription-popup__text {
+      margin-bottom: 25px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    
+    .subscription-popup__modern .subscription-popup__form {
+      margin-top: 0;
+    }
+    
+    .subscription-popup__modern .newsletter-form .form-field {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .subscription-popup__modern .newsletter-form .form-control {
+      border: none;
+      height: auto;
+      padding: 15px 25px;
+      border-radius: 10px;
+      background-color: #FFFFFF;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+    }
+    
+    .subscription-popup__modern .newsletter-form .btn {
+      position: relative;
+      width: 100%;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      text-transform: initial;
+      letter-spacing: normal;
+      background-color: #000000;
+      color: #FFFFFF;
+      height: auto;
+      font-size: 14px;
+    }
+    
+    /* Badge de cupom */
+    .subscription-popup__modern .coupon-badge {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 36px;
+      height: 36px;
+      background-color: #F3F69D;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Mensagem de sucesso */
+    .subscription-popup__modern .subscription-success {
+      padding: 15px;
+      background-color: #E8F5E9;
+      border-radius: 10px;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+    }
+    
+    .subscription-popup__modern .subscription-success svg {
+      flex-shrink: 0;
+      color: #4CAF50;
+    }
+    
+    .subscription-popup__modern .drawer__close-btn {
+      top: 10px;
+      right: 10px;
+      color: #000;
+      z-index: 10;
+      background: transparent;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    
+    @media (max-width: 400px) {
+      .subscription-popup__modern .drawer__inner {
+        width: 320px !important;
+        height: 440px !important;
+      }
+      
+      .subscription-popup__modern .product-image-container {
+        width: 240px;
+        top: -100px;
+      }
+      
+      .subscription-popup__modern .subscription-popup__blocks {
+        margin-top: 120px;
+        padding: 0 20px 20px;
+      }
+    }
+  {%- endstyle -%}
+
+  <link rel="stylesheet" href="{{ 'subscription-popup.css' | asset_url }}" media="print" onload="this.media='all'">
+  <noscript>{{ 'subscription-popup.css' | asset_url | stylesheet_tag }}</noscript>
+  {%- liquid
+    assign trigger_open = section.settings.trigger_open
+    assign repeat_open = section.settings.repeat_open
+    assign alignment = section.settings.alignment
+    assign width = section.settings.width
+    assign show_teaser = section.settings.show_teaser
+    assign teaser_button_text = section.settings.teaser_button_text
+    
+    assign modal_id = 'SubscriptionModal-' | append: section.id
+  -%}
+  <subscription-popup
+    id="{{ modal_id }}"
+    class="drawer modal subscription-popup subscription-popup__modern"
+    shopify-design-mode
+    hidden
+    data-trigger-open="{{ trigger_open }}"
+    data-repeat-open="{{ repeat_open }}"
+  >
+    <div class="fixed-overlay" aria-controls="{{ modal_id }}"></div>
+    <div class="drawer__inner">
+      <button
+        class="drawer__close-btn z-2"
+        aria-controls="{{ modal_id }}"
+        aria-label="{{ 'accessibility.close' | t }}"
+      >
+        {% render 'icon-close', size: 'large' %}
+      </button>
+      {%- render 'loading-spinner' -%}
+      <div class="drawer__body">
+        <div class="flex text-{{ alignment }}">
+          <div class="product-image-container">
+            <img src="https://cdn.shopify.com/s/files/1/0905/4810/9677/files/70_1_7460f42b-e489-4c9c-a34e-f575f664acb1.png" alt="Luminária ABAZZUR™" loading="lazy">
+          </div>
+          
+          <div class="subscription-popup__blocks">
+            <div class="subscription-popup__title">
+              <h3>
+                <span class="title-main">Vai garantir</span>
+                <span class="title-sub">ou deixar passar?</span>
+              </h3>
+            </div>
+            
+            <div class="subscription-popup__text rich-text__text rte">
+              <p>Inscreva-se em nossa newsletter e seja o<br>primeiro a receber ofertas e novidades da<br>ABAZZUR™.</p>
+            </div>
+            
+            <div class="subscription-popup__form">
+              <div class="newsletter-form">
+                {%- form 'customer', id: 'ContactSubscribe-Popup', is: 'newsletter-form' -%}
+                  <input type="hidden" name="contact[tags]" value="newsletter">
+                  <div class="newsletter-form__field-wrapper">
+                    <div class="form-field relative">
+                      <label class="form-label visually-hidden" for="NewsletterForm-Popup">
+                        {{ 'newsletter.label' | t }}
+                      </label>
+                      <input
+                        id="NewsletterForm-Popup"
+                        type="email"
+                        name="contact[email]"
+                        class="form-control flex-1"
+                        value="{{ form.email }}"
+                        aria-required="true"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        autocomplete="email"
+                        {% if form.errors %}
+                          autofocus
+                          aria-invalid="true"
+                          aria-describedby="Newsletter-error--Popup"
+                        {% elsif form.posted_successfully? %}
+                          aria-describedby="Newsletter-success--Popup"
+                        {% endif %}
+                        placeholder="Insira seu e-mail"
+                        required
+                      >
+                      <button
+                        type="submit"
+                        class="newsletter-form__button btn"
+                        name="commit"
+                        id="Newsletter-submit--Popup"
+                      >
+                        <span class="btn__text">Receber cupom</span>
+                        <div class="coupon-badge">
+                          <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                            <g fill="rgb(0,0,0)">
+                              <path clip-rule="evenodd" d="m1 8c0-2.76142 2.23858-5 5-5h12c2.7614 0 5 2.23858 5 5v1.22305c0 .69068-.4806 1.18285-.9893 1.35825-.5895.2033-1.0107.7631-1.0107 1.4187s.4212 1.2154 1.0107 1.4187c.5087.1754.9893.6676.9893 1.3583v1.223c0 2.7614-2.2386 5-5 5h-12c-2.76142 0-5-2.2386-5-5v-1.223c0-.6907.48057-1.1829.9893-1.3583.58951-.2033 1.0107-.7631 1.0107-1.4187s-.42119-1.2154-1.0107-1.4187c-.50873-.1754-.9893-.66757-.9893-1.35825zm5-3c-1.65685 0-3 1.34315-3 3v.83712c1.18151.5613 2 1.76548 2 3.16288s-.81849 2.6016-2 3.1629v.8371c0 1.6569 1.34315 3 3 3h12c1.6569 0 3-1.3431 3-3v-.8371c-1.1815-.5613-2-1.7655-2-3.1629s.8185-2.60158 2-3.16288v-.83712c0-1.65685-1.3431-3-3-3z" fill-rule="evenodd"/>
+                              <path d="m10.6044 10.6046c-.4452.4451-1.16685.4451-1.61197 0-.44513-.4452-.44513-1.16685 0-1.61198.44512-.44512 1.16677-.44512 1.61197 0 .4451.44513.4451 1.16678 0 1.61198z"/>
+                              <path d="m15.0075 15.0075c-.4452.4451-1.1668.4451-1.612 0-.4451-.4451-.4451-1.1668 0-1.6119.4452-.4452 1.1668-.4452 1.612 0 .4451.4451.4451 1.1668 0 1.6119z"/>
+                              <path clip-rule="evenodd" d="m14.9459 9.05405c.3905.39052.3905 1.02365 0 1.41425l-4.4776 4.4776c-.3905.3905-1.02371.3905-1.41423 0-.39053-.3905-.39052-1.0237 0-1.4142l4.47763-4.47765c.3905-.39053 1.0237-.39053 1.4142 0z" fill-rule="evenodd"/>
+                            </g>
+                          </svg>
+                        </div>
+                      </button>
+                      <p
+                        class="form-message alert alert--error blocks-radius hidden w-full"
+                        id="Newsletter-error-subscribed--Popup"
+                      >
+                        {% render 'icon-error' %}
+                        {{- 'newsletter.already_subscribed' | t -}}
+                      </p>
+                      {%- if form.errors -%}
+                        <p class="form-message alert alert--error blocks-radius w-full" id="Newsletter-error--Popup">
+                          {% render 'icon-error' %}
+                          {{- form.errors.translated_fields.email }}
+                          {{ form.errors.messages.email -}}
+                        </p>
+                      {%- endif -%}
+                      {%- if form.posted_successfully? -%}
+                        <p
+                          class="form-message alert alert--success blocks-radius h6 w-full"
+                          id="Newsletter-success--Popup"
+                          tabindex="-1"
+                          autofocus
+                        >
+                          {% render 'icon-success', size: 'small' %}
+                          {{- 'newsletter.success' | t }}
+                        </p>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                {%- endform -%}
+              </div>
+            </div>
+            
+            <div class="subscription-success" style="display: none;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
+              </svg>
+              <span>Parabéns por se inscrever! Confira seu e-mail, pois enviamos um cupom exclusivo de boas-vindas!</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </subscription-popup>
+  
+  {%- if show_teaser and teaser_button_text != blank -%}
+    <button
+      class="subscription-popup__teaser btn btn--primary no-js-hidden"
+      role="button"
+      aria-haspopup="dialog"
+      aria-controls="{{ modal_id }}"
+      style="--color-button: {{ section.settings.teaser_popup_bg.red }},{{ section.settings.teaser_popup_bg.green }},{{ section.settings.teaser_popup_bg.blue }};--color-button-text:{{ section.settings.teaser_popup_text.red }},{{ section.settings.teaser_popup_text.green }},{{ section.settings.teaser_popup_text.blue }};"
+    >
+      <span class="btn__text flex items-center gap-3">
+        {%- render 'icon-envelope-simple' %}
+        {{- teaser_button_text -}}
+      </span>
+    </button>
+  {%- endif -%}
+  <script src="{{ 'subscription-popup.js' | asset_url }}" defer="defer"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const popupElement = document.querySelector('.subscription-popup__modern');
+      if (!popupElement) return;
+      
+      // Adicionar fonte Inter do Google Fonts
+      const linkElement = document.createElement('link');
+      linkElement.rel = 'stylesheet';
+      linkElement.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
+      document.head.appendChild(linkElement);
+      
+      // Mostrar mensagem de sucesso quando o formulário for enviado com sucesso
+      const newsForm = popupElement.querySelector('form');
+      const successMessage = popupElement.querySelector('.subscription-success');
+      
+      if (newsForm && successMessage) {
+        newsForm.addEventListener('submit', function(e) {
+          setTimeout(function() {
+            const formMessage = popupElement.querySelector('.form-message.alert--success');
+            if (formMessage && formMessage.style.display !== 'none') {
+              formMessage.style.display = 'none';
+              successMessage.style.display = 'flex';
+            }
+          }, 1000);
+        });
+      }
+    });
+  </script>
+{%- endif -%}
+{% schema %}
+{
+  "name": "Popup Newsletter",
+  "enabled_on": {
+    "groups": ["custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable",
+      "label": "Ativar popup",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_for_homepage_only",
+      "label": "Mostrar apenas na página inicial",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_for_visitors_only",
+      "label": "Mostrar apenas para visitantes",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "trigger_open",
+      "label": "Quando exibir o popup",
+      "options": [
+        {
+          "value": "immediately",
+          "label": "Imediatamente"
+        },
+        {
+          "value": "delay",
+          "label": "Após 5 segundos"
+        },
+        {
+          "value": "scroll_down",
+          "label": "Ao rolar a página"
+        }
+      ],
+      "default": "delay",
+      "info": "Define quando o popup será exibido ao usuário"
+    },
+    {
+      "type": "select",
+      "id": "repeat_open",
+      "label": "Frequência de exibição",
+      "info": "Define com que frequência o popup será exibido para o mesmo usuário",
+      "options": [
+        {
+          "value": "no_repeat",
+          "label": "Não repetir"
+        },
+        {
+          "value": "every_30_mins",
+          "label": "A cada 30 minutos"
+        },
+        {
+          "value": "every_1_hr",
+          "label": "A cada hora"
+        },
+        {
+          "value": "every_day",
+          "label": "A cada dia"
+        },
+        {
+          "value": "every_3_days",
+          "label": "A cada 3 dias"
+        },
+        {
+          "value": "every_week",
+          "label": "A cada semana"
+        }
+      ],
+      "default": "every_day"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alinhamento do texto",
+      "options": [
+        {
+          "value": "left",
+          "label": "Esquerda"
+        },
+        {
+          "value": "center",
+          "label": "Centro"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "Largura do popup",
+      "min": 400,
+      "max": 900,
+      "step": 5,
+      "unit": "px",
+      "default": 800
+    },
+    {
+      "type": "header",
+      "content": "Conteúdo do popup"
+    },
+    {
+      "type": "text",
+      "id": "popup_heading",
+      "label": "Título",
+      "default": "Vai garantir ou deixar passar?"
+    },
+    {
+      "type": "text",
+      "id": "popup_text",
+      "label": "Texto",
+      "default": "Inscreva-se em nossa newsletter e seja o primeiro a receber ofertas e novidades da ABAZZUR™."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto do botão",
+      "default": "RECEBER CUPOM"
+    },
+    {
+      "type": "header",
+      "content": "Botão lateral",
+      "info": "Botão que fica na lateral da página para abrir o popup"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_teaser",
+      "label": "Mostrar botão lateral",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "teaser_button_text",
+      "label": "Texto do botão",
+      "default": "Newsletter"
+    },
+    {
+      "type": "header",
+      "content": "Cores"
+    },
+    {
+      "type": "color",
+      "id": "teaser_popup_bg",
+      "label": "Cor de fundo do botão lateral",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "teaser_popup_text",
+      "label": "Cor do texto do botão lateral",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Popup Newsletter"
+    }
+  ]
+}
+{% endschema %}

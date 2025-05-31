@@ -1,0 +1,31 @@
+.toggle-spotlight-drawer {
+  transform: translate(0, -50%) !important;
+}
+
+.drawer--spotlight .drawer__header-message {
+  padding: 1rem 1.5rem;
+}
+.drawer--spotlight .drawer__body {
+  padding: 2.4rem 3rem;
+}
+
+.spotlight__list {
+  gap: 1rem;
+}
+.spotlight__item {
+  border: 0.1rem solid rgb(var(--color-border));
+  padding: 1.3rem 1.5rem;
+  min-height: 11rem;
+}
+.spotlight__item-icon {
+  padding-top: 0.7rem;
+}
+
+@media (max-width: 767.98px) {
+  .drawer--spotlight .drawer__body {
+    padding: 1.6rem;
+  }
+  .spotlight__item {
+    min-height: 10rem;
+  }
+}

@@ -1,0 +1,82 @@
+.image-with-text__media {
+  max-width: 100%;
+  width: var(--image-width, 100%);
+}
+@media (max-width: 767.98px) {
+  .image-with-text__media {
+    width: 100%;
+  }
+}
+.image-with-text__inner {
+  --padding-x: 0;
+}
+@media (min-width: 768px) {
+  .image-with-text__inner {
+    --padding-x: 5rem;
+    flex: 0 0 var(--image-width);
+    max-width: calc(100% - var(--image-width));
+  }
+}
+@media (min-width: 1024px) {
+  .image-with-text__inner {
+    --padding-x: 10rem;
+  }
+}
+.image-with-text__badge {
+  font-size: 1rem;
+  font-weight: var(--font-heading-weight);
+  top: 10%;
+  left: 100%;
+  transform: translateX(-50%);
+  width: var(--badge-size, 13rem);
+  height: var(--badge-size, 13rem);
+}
+@media (max-width: 1023.98px) {
+  .image-with-text__badge {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 767.98px) {
+  .image-with-text__badge {
+    left: unset;
+    right: 0;
+    transform: unset;
+    font-size: 0.6rem;
+    width: var(--badge-size, 8.3rem);
+    height: var(--badge-size, 8.3rem);
+  }
+}
+.image-with-text__badge .split-chars {
+  animation: spin infinite linear 12s;
+  animation-direction: reverse;
+}
+.image-with-text__badge .split-chars span {
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(calc(var(--inner-angle) * var(--char-id))) translateY(var(--radius));
+}
+.image-with-text__badge .badge__icon {
+  width: 100%;
+  max-width: var(--badge-image-size);
+}
+.image-with-text .icon-with-text .icon {
+  color: rgba(var(--icon-color), 1);
+}
+@media (max-width: 767.98px) {
+  .image-with-text--show-badge .image-with-text__media {
+    padding: 0 2.2rem;
+  }
+}
+.image-with-text--image-right .image-with-text__inner {
+  padding-inline-end: var(--padding-x);
+}
+@media (min-width: 768px) {
+  .image-with-text--image-right .image-with-text__badge {
+    left: 0;
+  }
+}
+.image-with-text--image-left .image-with-text__inner {
+  padding-inline-start: var(--padding-x);
+}

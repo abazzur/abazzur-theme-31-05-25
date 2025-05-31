@@ -1,0 +1,108 @@
+{% liquid
+  assign image = block.settings.image
+  assign text = block.settings.text
+  assign author = block.settings.author
+  assign bio = block.settings.bio
+  assign avatar = block.settings.avatar
+  assign icon = block.settings.icon
+
+  assign image_ratio = image_ratio | default: 'adapt'
+  if image_ratio == 'adapt'
+    if image != blank
+      assign image_ratio = image.aspect_ratio
+    else
+      assign image_ratio = '1'
+    endif
+  endif
+%}
+
+<div class="testimonial testimonial--layout-1 h-full">
+  <div class="testimonial__container{% if has_bg %} testimonial--has-bg blocks-radius{% endif %} color-{{ color_scheme }} h-full flex flex-col{% unless image != blank %} text-center{% endunless %}">
+    <div class="testimonial__wrapper">
+      {% if image != blank %}
+        {% assign alt = image.alt | default: shop.name | escape %}
+        <div class="testimonial__image media-wrapper blocks-radius">
+          <motion-element data-motion="zoom-out-sm" class="block" style="--aspect-ratio: {{ image_ratio }};">
+            {{
+              image
+              | image_url: width: 750
+              | image_tag:
+                loading: 'lazy',
+                widths: '165, 360, 535, 750',
+                is: 'image-lazy',
+                alt: alt,
+                class: 'motion-reduce'
+            }}
+          </motion-element>
+        </div>
+      {% endif %}
+
+      <div class="testimonial__inner">
+        {% if icon != 'none' %}
+          <div class="testimonial__icon{% unless image != blank %} justify-center{% endunless %}">
+            {% render 'icon-testimonial', icon_name: block.settings.icon %}
+          </div>
+        {% endif %}
+        {% if text != blank %}
+          <div class="testimonial__content h1 rte">{{ text }}</div>
+        {% endif %}
+        {% if author != blank or bio != blank or avatar != blank %}
+          <div class="testimonial__author inline-flex items-center gap-x-3">
+            {% if avatar != blank %}
+              {% liquid
+                assign alt_default = author | default: shop.name
+                assign alt = avatar.alt | default: alt_default | escape
+              %}
+              <div class="testimonial__avatar rounded overflow-hidden" style="--aspect-ratio: 1;">
+                {{
+                  avatar
+                  | image_url: width: 360
+                  | image_tag: loading: 'lazy', widths: '50, 100', sizes: '50px', is: 'image-lazy', alt: alt
+                }}
+              </div>
+            {% endif %}
+            <div class="testimonial__info text-left flex flex-col gap-y-1{% if image == blank and avatar == blank %} items-center text-center{% endif %}">
+              {% if author != blank %}
+                <h3 class="testimonial__name h5">{{ author }}</h3>
+              {% endif %}
+              {% if bio != blank %}
+                <div class="testimonial__bio text-subtext">{{ bio }}</div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if block.settings.product != blank %}
+      <div class="testimonial__footer{% if has_bg %} flex-1 flex flex-col justify-end{% endif %}">
+        {%- liquid
+          assign product = all_products[block.settings.product]
+          assign alt = product.featured_image | default: product.title | escape
+        -%}
+        <a
+          class="testimonial__product{% unless image != blank %} justify-center{% endunless %}"
+          href="{{ product.url }}"
+          target="_blank"
+        >
+          <span class="block blocks-radius-sm" style="--aspect-ratio: 1;">
+            {{
+              product.featured_image
+              | image_url: width: 360
+              | image_tag:
+                loading: 'lazy',
+                widths: '40, 80',
+                sizes: '40px',
+                is: 'image-lazy',
+                alt: alt,
+                class: 'motion-reduce'
+            }}
+          </span>
+          <p class="testimonial__product-title m-0">
+            <span class="reversed-link">{{ product.title }}</span>
+          </p>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>

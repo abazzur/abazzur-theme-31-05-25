@@ -1,0 +1,202 @@
+/* ABAZZUR™ Customer Classification Pop-up Styles */
+:root {
+  --abazzur-font-primary: 'Inter', sans-serif;
+  --abazzur-bg-color: #FFFFFF;
+  --abazzur-text-color: #000000;
+  --abazzur-border-color: #E8E8E8;
+  --abazzur-hover-color: #F0F4FF;
+}
+
+.abazzur-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  font-family: var(--abazzur-font-primary);
+}
+
+.abazzur-popup.active {
+  display: block;
+}
+
+.abazzur-popup-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+}
+
+.abazzur-popup-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: var(--abazzur-bg-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  text-align: center;
+}
+
+.abazzur-popup-logo {
+  margin-bottom: 30px;
+}
+
+.abazzur-popup h2 {
+  font-family: var(--abazzur-font-primary);
+  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: var(--abazzur-text-color);
+}
+
+.abazzur-popup-text {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  color: var(--abazzur-text-color);
+}
+
+.abazzur-popup-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.abazzur-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--abazzur-bg-color);
+  border: 1px solid var(--abazzur-text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.abazzur-btn:hover {
+  background-color: var(--abazzur-hover-color);
+}
+
+.abazzur-btn-title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.abazzur-btn-subtitle {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.abazzur-popup-auth-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.abazzur-btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px;
+  background-color: var(--abazzur-bg-color);
+  border: 1px solid var(--abazzur-border-color);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.abazzur-btn-email {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--abazzur-border-color);
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.abazzur-popup-divider {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.abazzur-popup-divider::before,
+.abazzur-popup-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--abazzur-border-color);
+}
+
+.abazzur-popup-divider span {
+  padding: 0 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.abazzur-register-form {
+  width: 100%;
+}
+
+.abazzur-form-field {
+  margin-bottom: 16px;
+}
+
+.abazzur-form-field input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--abazzur-border-color);
+  border-radius: 6px;
+  font-family: var(--abazzur-font-primary);
+  font-size: 14px;
+}
+
+.abazzur-form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.abazzur-form-checkbox label {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.abazzur-btn-submit {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--abazzur-border-color);
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Responsivo */
+@media (max-width: 580px) {
+  .abazzur-popup-container {
+    width: 90%;
+    padding: 30px 20px;
+  }
+}

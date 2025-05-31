@@ -1,0 +1,42 @@
+{%- liquid
+  assign discount_minimum_amount = 500000
+  assign cart_total = cart.total_price | plus: 0
+  
+  # Calcular quanto falta para atingir o objetivo
+  assign amount_remaining = discount_minimum_amount | minus: cart_total
+  if amount_remaining < 0
+    assign amount_remaining = 0
+  endif
+  
+  # Calcular porcentagem do progresso (limitado a 100%)
+  assign percentage = cart_total | times: 100.0 | divided_by: discount_minimum_amount
+  if percentage > 100
+    assign percentage = 100
+  endif
+  
+  # Determinar se o desconto foi ganho
+  assign discount_earned = false
+  if cart_total >= discount_minimum_amount
+    assign discount_earned = true
+  endif
+-%}
+
+<div class="discount-goal-container{% if classes %} {{ classes }}{% endif %}">
+  <div class="discount-goal" data-cart-total="{{ cart_total }}" data-minimum-amount="{{ discount_minimum_amount }}" data-discount-earned="{{ discount_earned }}">
+    {% if discount_earned %}
+      <div class="discount-goal-label discount-goal-label--success">
+        <span class="discount-badge">15% OFF</span>
+        <span>Parabéns! Você ganhou 15% de desconto em sua compra!</span>
+      </div>
+    {% else %}
+      <div class="discount-goal-label discount-goal-label--default">
+        <span class="discount-badge">15% OFF</span>
+        <span>Adicione mais {{ amount_remaining | money }} para ganhar 15% de desconto em sua compra</span>
+      </div>
+    {% endif %}
+    
+    <div class="discount-progress-wrapper">
+      <div class="discount-progress-bar" style="--progress-percentage: {{ percentage }}%"></div>
+    </div>
+  </div>
+</div>
